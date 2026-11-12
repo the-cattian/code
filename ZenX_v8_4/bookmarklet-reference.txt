@@ -1,0 +1,636 @@
+javascript:(() => { if (typeof window.__zd_skin_teardown__ === 'function') { try { window.__zd_skin_teardown__(); } catch(e) {} window.__zd_skin_teardown__ = null; return; } if (document.documentElement.classList.contains("zskin-active") || document.getElementById('zd-floating-sla-timer')) { try { const widget = document.getElementById('zd-floating-sla-timer'); if (widget) widget.remove(); const styleEl = document.getElementById('zd-floating-sla-timer-css'); if (styleEl) styleEl.remove(); const skinStyle = document.getElementById('hamza-zendesk-dark-skin-v2'); if (skinStyle) skinStyle.remove(); document.querySelectorAll("[data-zd-hidden-tags]").forEach(el => { el.style.removeProperty('display'); el.removeAttribute('data-zd-hidden-tags'); }); document.querySelectorAll("[data-zd-hidden-also-here]").forEach(el => { el.style.removeProperty('display'); el.removeAttribute('data-zd-hidden-also-here'); }); document.querySelectorAll("[data-zd-hidden-divider]").forEach(el => { el.style.removeProperty('display'); el.removeAttribute('data-zd-hidden-divider'); }); document.querySelectorAll("[data-zd-hidden-custom]").forEach(el => { el.style.removeProperty('display'); el.removeAttribute('data-zd-hidden-custom'); }); document.documentElement.classList.remove("zskin-dark", "zskin-light", "zskin-active"); document.querySelectorAll("article[data-chat-role]").forEach(a => a.removeAttribute("data-chat-role")); document.querySelectorAll("[data-sender-name]").forEach(el => { el.removeAttribute("data-sender-name"); el.removeAttribute("data-msg-time"); }); document.querySelectorAll('[data-hamza-zskin-processed]').forEach(el => el.removeAttribute('data-hamza-zskin-processed')); } catch(e) {} console.info("[Zendesk Skin] Deactivated and original appearance restored."); return; } const ID = 'hamza-zendesk-dark-skin-v2'; const FILTER_ATTR = 'data-zs-panel-dark'; const PROCESSED_ATTR = 'data-hamza-zskin-processed'; const safeStorage = { getItem(key) { try { if (window.localStorage) { const v = window.localStorage.getItem(key); if (v !== null && v !== undefined) return v; } } catch(e) {} try { if (window.sessionStorage) { const v = window.sessionStorage.getItem(key); if (v !== null && v !== undefined) return v; } } catch(e) {} try { const m = document.cookie.match(new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)')); if (m) return decodeURIComponent(m[1]); } catch(e) {} return null; }, setItem(key, value) { try { window.localStorage && window.localStorage.setItem(key, value); } catch(e) {} try { window.sessionStorage && window.sessionStorage.setItem(key, value); } catch(e) {} try { document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) + '; path=/; max-age=31536000; SameSite=Lax'; } catch(e) {} } }; const docMap = new Map(); let intervalId = 0; const THEME_KEY = 'zd_theme_mode'; let darkMode = (() => { try { const saved = safeStorage.getItem(THEME_KEY); if (saved === 'light') return false; if (saved === 'dark') return true; } catch(e) {} return true; })(); const clamp = (val, min, max) => Math.min(max, Math.max(min, val)); const toRgba = (c, a) => `rgba(${Math.round(c.r)},${Math.round(c.g)},${Math.round(c.b)},${a})`; function parseColor(str) { if (!str || str === 'transparent') return null; let m = str.match(/rgba?\(([^)]+)\)/i); if (!m) return null; let parts = m[1].split(/[\s,\/]+/).map(Number); if (parts.length < 3 || parts.some(isNaN)) return null; return { r: parts[0], g: parts[1], b: parts[2], a: parts.length > 3 ? clamp(parts[3], 0, 1) : 1 }; } const sRGBToLinear = c => (c /= 255, c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)); const getLuminance = c => 0.2126 * sRGBToLinear(c.r) + 0.7152 * sRGBToLinear(c.g) + 0.0722 * sRGBToLinear(c.b); function rgbToHsl(r, g, b) { r /= 255; g /= 255; b /= 255; let max = Math.max(r, g, b), min = Math.min(r, g, b); let h = 0, s = 0, l = (max + min) / 2; if (max !== min) { let d = max - min; s = l > 0.5 ? d / (2 - max - min) : d / (max + min); if (max === r) h = (g - b) / d + (g < b ? 6 : 0); else if (max === g) h = (b - r) / d + 2; else h = (r - g) / d + 4; h *= 60; } return { h, s, l }; } function hslToRgb(h, s, l) { h = (h % 360 + 360) % 360 / 360; let q = l < 0.5 ? l * (1 + s) : l + s - l * s; let p = 2 * l - q; let hue2rgb = t => { t = (t % 1 + 1) % 1; if (t < 1/6) return p + (q - p) * 6 * t; if (t < 1/2) return q; if (t < 2/3) return p + (q - p) * (2/3 - t) * 6; return p; }; return { r: hue2rgb(h + 1/3) * 255, g: hue2rgb(h) * 255, b: hue2rgb(h - 1/3) * 255 }; } function darkBg(rgb, depth) { let { h, s, l } = rgbToHsl(rgb.r, rgb.g, rgb.b); if (h >= 30 && h <= 65 && l > 0.6) { return hslToRgb(38, 0.15, 0.11); } if (s < 0.22) { let lightness = [0.09, 0.13, 0.17]; return hslToRgb(h, Math.min(s + 0.04, 0.08), lightness[clamp(depth - 1, 0, 2)]); } return hslToRgb(h, clamp(s * 0.45, 0.15, 0.35), clamp(0.05 + l * 0.2, 0.09, 0.2)); } function darkBorder(rgb) { let { h, s, l } = rgbToHsl(rgb.r, rgb.g, rgb.b); return hslToRgb(h, Math.min(s, 0.2), clamp(0.14 + (l - 0.5) * 0.32, 0.14, 0.34)); } function lightText(rgb) { let { h, s, l } = rgbToHsl(rgb.r, rgb.g, rgb.b); return hslToRgb(h, clamp(s, 0, 0.55), clamp(0.72 + 0.26 * l, 0.72, 0.97)); } function lightFill(rgb) { let { h, s, l } = rgbToHsl(rgb.r, rgb.g, rgb.b); return hslToRgb(h, clamp(s, 0, 0.4), clamp(0.62 + 0.3 * l, 0.62, 0.92)); } function collectDocs(rootDoc, acc) { acc.push(rootDoc); let frames = []; try { frames = rootDoc.querySelectorAll('iframe'); } catch(e) {} for (let f of frames) { let d = null; try { d = f.contentDocument; } catch(e) {} if (d && d.body) collectDocs(d, acc); } return acc; } function injectLayoutAndColorCss(doc) { try { let sheet = new doc.defaultView.CSSStyleSheet(); sheet.replaceSync(` html.zskin-active [class*="pane"], html.zskin-active [class*="Sidebar"] { padding: 12px !important; gap: 12px !important; } html.zskin-active input, html.zskin-active select, html.zskin-active textarea { border-radius: 6px !important; } html.zskin-active [class*="tag"], html.zskin-active [class*="token"], html.zskin-active [class*="pill"] { border-radius: 12px !important; padding: 3px 8px !important; margin: 2px !important; display: inline-flex !important; align-items: center !important; } html.zskin-active [data-zd-hidden-tags="true"], html.zskin-active [data-zd-hidden-also-here="true"], html.zskin-active [data-zd-hidden-divider="true"], html.zskin-active [data-zd-hidden-custom] { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; border: none !important; overflow: hidden !important; } html.zskin-active article[data-test-id="omni-log-comment-item"] { background: transparent !important; border: none !important; padding: 4px 20px !important; margin: 3px 0 !important; display: flex !important; width: 100% !important; box-sizing: border-box !important; position: relative !important; } html.zskin-active article[data-test-id="omni-log-comment-item"] [data-test-id="omni-log-comment-avatar"], html.zskin-active article[data-test-id="omni-log-comment-item"] [data-test-id="omni-log-base-avatar"], html.zskin-active article[data-test-id="omni-log-comment-item"] [data-test-id="omni-log-comment-header"], html.zskin-active article[data-test-id="omni-log-comment-item"] [data-test-id="omni-log-item-sender"], html.zskin-active article[data-test-id="omni-log-comment-item"] [data-test-id="convo-log-item-authenticated-indicator"], html.zskin-active article[data-test-id="omni-log-comment-item"] [data-test-id="omni-log-item-originated-from"], html.zskin-active article[data-test-id="omni-log-comment-item"] [data-test-id="timestamp-relative"], html.zskin-active article[data-test-id="omni-log-comment-item"] [data-test-id="timestamp-absolute"], html.zskin-active article[data-test-id="omni-log-comment-item"] h4, html.zskin-active article[data-test-id="omni-log-comment-item"] [class*="sc-71ab6acd-2"], html.zskin-active article[data-test-id="omni-log-comment-item"] [class*="sc-71ab6acd-3"], html.zskin-active article[data-test-id="omni-log-comment-item"] [class*="sc-71ab6acd-7"], html.zskin-active article[data-test-id="omni-log-comment-item"] [class*="sc-71ab6acd-8"], html.zskin-active article[data-test-id="omni-log-comment-item"] > div:not([data-test-id="omni-log-omni-to-ag-comment"]):not([class*="sc-71ab6acd-4"]) { display: none !important; width: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important; border: none !important; visibility: hidden !important; } html.zskin-active article[data-test-id="omni-log-comment-item"] [data-test-id="omni-log-omni-to-ag-comment"], html.zskin-active article[data-test-id="omni-log-comment-item"] [class*="sc-71ab6acd-4"] { display: flex !important; flex-direction: column !important; width: 100% !important; max-width: 100% !important; background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; } html.zskin-active article[data-test-id="omni-log-comment-item"] [data-test-id="omni-log-omni-to-ag-comment"] > div { display: flex !important; flex-direction: column !important; width: 100% !important; background: transparent !important; } html.zskin-active article[data-chat-role="customer"], html.zskin-active article[data-chat-role="bot"] { flex-direction: row !important; justify-content: flex-start !important; } html.zskin-active article[data-chat-role="customer"] [data-test-id="omni-log-omni-to-ag-comment"], html.zskin-active article[data-chat-role="bot"] [data-test-id="omni-log-omni-to-ag-comment"], html.zskin-active article[data-chat-role="customer"] [data-test-id="omni-log-omni-to-ag-comment"] > div, html.zskin-active article[data-chat-role="bot"] [data-test-id="omni-log-omni-to-ag-comment"] > div { align-items: flex-start !important; } html.zskin-active article[data-chat-role="customer"] [data-test-id="omni-log-item-message"], html.zskin-active article[data-chat-role="bot"] [data-test-id="omni-log-item-message"] { align-self: flex-start !important; margin-right: auto !important; margin-left: 0 !important; border-radius: 12px 12px 12px 4px !important; padding: 8px 12px 22px 12px !important; max-width: 78% !important; position: relative !important; display: flex !important; flex-direction: column !important; text-align: left !important; } html.zskin-active article[data-chat-role="agent"] { flex-direction: row !important; justify-content: flex-end !important; } html.zskin-active article[data-chat-role="agent"] [data-test-id="omni-log-omni-to-ag-comment"], html.zskin-active article[data-chat-role="agent"] [data-test-id="omni-log-omni-to-ag-comment"] > div { align-items: flex-end !important; } html.zskin-active article[data-chat-role="agent"] [data-test-id="omni-log-item-message"] { align-self: flex-end !important; margin-left: auto !important; margin-right: 0 !important; border-radius: 12px 12px 4px 12px !important; padding: 8px 12px 22px 12px !important; max-width: 78% !important; position: relative !important; display: flex !important; flex-direction: column !important; text-align: left !important; } html.zskin-active [data-test-id="omni-log-item-message"]::before { content: attr(data-sender-name); font-weight: 700; font-size: 11px; margin-bottom: 3px; display: block; opacity: 0.95; } html.zskin-active [data-test-id="omni-log-item-message"]:not([data-sender-name])::before, html.zskin-active [data-test-id="omni-log-item-message"][data-sender-name=""]::before { display: none !important; } html.zskin-active [data-test-id="omni-log-item-message"]::after { content: attr(data-msg-time); font-size: 10px; position: absolute; bottom: 4px; right: 10px; opacity: 0.75; font-family: inherit; } html.zskin-active [data-test-id="omni-log-item-message"]:not([data-msg-time])::after, html.zskin-active [data-test-id="omni-log-item-message"][data-msg-time=""]::after { display: none !important; } html.zskin-active [data-test-id="omni-log-message-content"] { word-break: break-word !important; overflow-wrap: break-word !important; white-space: pre-wrap !important; line-height: 1.45 !important; font-size: 13.5px !important; } html.zskin-active article[data-chat-role="internal"] { border-left: 4px solid #f59e0b !important; border-radius: 10px !important; padding: 12px 16px !important; margin: 8px 14px !important; } html.zskin-active article[data-chat-role="internal"] [data-test-id="omni-log-item-message"] { background: transparent !important; border: none !important; box-shadow: none !important; padding: 4px 0 0 0 !important; max-width: 100% !important; } html.zskin-light [data-test-id="component-type-MainConversationPane"], html.zskin-light [data-test-id="ticket-main-conversation"], html.zskin-light [data-test-id="omni-log-container"] { background: #f0f2f5 !important; } html.zskin-light article[data-chat-role="customer"] [data-test-id="omni-log-item-message"] { background: #ffffff !important; color: #111b21 !important; border: 1px solid #e2e8f0 !important; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08) !important; } html.zskin-light article[data-chat-role="customer"] [data-test-id="omni-log-item-message"] * { color: #111b21 !important; } html.zskin-light article[data-chat-role="customer"] [data-test-id="omni-log-item-message"]::before { color: #0284c7 !important; } html.zskin-light article[data-chat-role="customer"] [data-test-id="omni-log-item-message"]::after { color: #64748b !important; } html.zskin-light article[data-chat-role="agent"] [data-test-id="omni-log-item-message"] { background: linear-gradient(135deg, #d9fdd3 0%, #cbf8c1 100%) !important; color: #111b21 !important; border: 1px solid rgba(0, 128, 105, 0.22) !important; box-shadow: 0 1px 3px rgba(0, 128, 105, 0.12) !important; } html.zskin-light article[data-chat-role="agent"] [data-test-id="omni-log-item-message"] * { color: #111b21 !important; } html.zskin-light article[data-chat-role="agent"] [data-test-id="omni-log-item-message"]::before { color: #0f5132 !important; } html.zskin-light article[data-chat-role="agent"] [data-test-id="omni-log-item-message"]::after { color: #3b5a45 !important; } html.zskin-light article[data-chat-role="bot"] [data-test-id="omni-log-item-message"] { background: #f1f5f9 !important; color: #1e293b !important; border: 1px solid #cbd5e1 !important; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06) !important; } html.zskin-light article[data-chat-role="bot"] [data-test-id="omni-log-item-message"] * { color: #1e293b !important; } html.zskin-light article[data-chat-role="bot"] [data-test-id="omni-log-item-message"]::before { color: #4338ca !important; } html.zskin-light article[data-chat-role="bot"] [data-test-id="omni-log-item-message"]::after { color: #64748b !important; } html.zskin-light article[data-chat-role="internal"] { background: #fffbeb !important; border: 1px solid #fde68a !important; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.1) !important; color: #1f2937 !important; } html.zskin-light article[data-chat-role="internal"] [data-test-id="omni-log-item-message"] * { color: #1f2937 !important; } html.zskin-light [data-test-id="omni-log-internal-note-tag"] { background: #fef3c7 !important; color: #b45309 !important; border: 1px solid #fcd34d !important; font-weight: 700 !important; font-size: 11px !important; border-radius: 6px !important; padding: 2px 8px !important; text-transform: uppercase !important; } html.zskin-dark { color-scheme: dark; --zs-bg: rgb(14, 17, 22); --zs-surface: rgb(21, 27, 35); --zs-surface2: rgb(29, 37, 48); --zs-border: rgb(44, 55, 69); --zs-text: rgb(230, 237, 243); --zs-muted: rgb(159, 177, 195); --zs-accent: rgb(77, 163, 255); accent-color: var(--zs-accent); --zd-agent-gradient: linear-gradient(135deg, #005c4b 0%, #008069 100%); --zd-customer-bubble: #1e293b; --zd-bot-bubble: #182033; --zd-internal-bg: #151821; --zd-internal-border: rgba(245, 158, 11, 0.32); } html.zskin-dark, html.zskin-dark body { background: var(--zs-bg) !important; color: var(--zs-text) !important; } html.zskin-dark input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=button]):not([type=submit]):not([type=reset]), html.zskin-dark textarea, html.zskin-dark select, html.zskin-dark [contenteditable="true"], html.zskin-dark [data-test-id*="input"], html.zskin-dark [data-test-id*="editor"] { background: var(--zs-surface2) !important; color: var(--zs-text) !important; border-color: var(--zs-border) !important; -webkit-text-fill-color: var(--zs-text) !important; } html.zskin-dark input::placeholder, html.zskin-dark textarea::placeholder { color: var(--zs-muted) !important; -webkit-text-fill-color: var(--zs-muted) !important; } html.zskin-dark option { background: var(--zs-surface2); color: var(--zs-text); } html.zskin-dark ::selection { background: rgb(46, 93, 142); color: rgb(255, 255, 255); } html.zskin-dark * { scrollbar-width: thin; scrollbar-color: rgb(85, 101, 125) transparent; } html.zskin-dark *::-webkit-scrollbar { width: 10px; height: 10px; } html.zskin-dark *::-webkit-scrollbar-thumb { background: rgb(85, 101, 125); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; } html.zskin-dark *::-webkit-scrollbar-track { background: transparent; } html.zskin-dark :focus-visible { outline: 2px solid var(--zs-accent) !important; outline-offset: 1px; } html.zskin-dark [data-test-id="component-type-MainConversationPane"], html.zskin-dark [data-test-id="ticket-main-conversation"], html.zskin-dark [data-test-id="omni-log-container"] { background: var(--zs-bg) !important; } html.zskin-dark article[data-chat-role="customer"] [data-test-id="omni-log-item-message"] { background: var(--zd-customer-bubble) !important; color: #f1f5f9 !important; border: 1px solid rgba(255, 255, 255, 0.08) !important; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important; } html.zskin-dark article[data-chat-role="customer"] [data-test-id="omni-log-item-message"] * { color: #f1f5f9 !important; } html.zskin-dark article[data-chat-role="customer"] [data-test-id="omni-log-item-message"]::before { color: #93c5fd !important; } html.zskin-dark article[data-chat-role="customer"] [data-test-id="omni-log-item-message"]::after { color: #94a3b8 !important; } html.zskin-dark article[data-chat-role="agent"] [data-test-id="omni-log-item-message"] { background: var(--zd-agent-gradient) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; box-shadow: 0 4px 14px rgba(0, 128, 105, 0.35) !important; } html.zskin-dark article[data-chat-role="agent"] [data-test-id="omni-log-item-message"] * { color: #ffffff !important; } html.zskin-dark article[data-chat-role="agent"] [data-test-id="omni-log-item-message"]::before { color: #bbf7d0 !important; } html.zskin-dark article[data-chat-role="agent"] [data-test-id="omni-log-item-message"]::after { color: rgba(255, 255, 255, 0.75) !important; } html.zskin-dark article[data-chat-role="bot"] [data-test-id="omni-log-item-message"] { background: var(--zd-bot-bubble) !important; color: #e2e8f0 !important; border: 1px solid rgba(99, 102, 241, 0.28) !important; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important; } html.zskin-dark article[data-chat-role="bot"] [data-test-id="omni-log-item-message"] * { color: #e2e8f0 !important; } html.zskin-dark article[data-chat-role="bot"] [data-test-id="omni-log-item-message"]::before { color: #a5b4fc !important; } html.zskin-dark article[data-chat-role="bot"] [data-test-id="omni-log-item-message"]::after { color: #94a3b8 !important; } html.zskin-dark article[data-chat-role="internal"] { background: var(--zd-internal-bg) !important; border: 1px solid var(--zd-internal-border) !important; border-left: 4px solid #f59e0b !important; color: #f1f5f9 !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important; } html.zskin-dark article[data-chat-role="internal"] [data-test-id="omni-log-item-message"] * { color: #f1f5f9 !important; } html.zskin-dark [data-test-id="omni-log-internal-note-tag"] { background: rgba(245, 158, 11, 0.2) !important; color: #fbbf24 !important; border: 1px solid rgba(245, 158, 11, 0.45) !important; font-weight: 700 !important; font-size: 11px !important; border-radius: 6px !important; padding: 2px 8px !important; text-transform: uppercase !important; } `); let adopted = doc.adoptedStyleSheets ? Array.from(doc.adoptedStyleSheets) : []; if (!adopted.includes(sheet)) doc.adoptedStyleSheets = adopted.concat(sheet); return sheet; } catch(e) { let st = doc.createElement('style'); st.id = ID; st.textContent = ``; (doc.head || doc.documentElement).appendChild(st); return null; } } function resolveEffectiveBg(el, cache, defaultView) { let chain = [], curr = el; while (curr && curr.nodeType === 1) { let c = cache.get(curr); if (c === undefined) { c = parseColor(defaultView.getComputedStyle(curr).backgroundColor); cache.set(curr, c); } chain.push(c); if (c && c.a >= 0.999) break; curr = curr.parentElement; } let res = null; for (let i = chain.length - 1; i >= 0; i--) { let bg = chain[i]; if (!bg) continue; if (!res) { if (bg.a >= 0.999) res = { r: bg.r, g: bg.g, b: bg.b }; continue; } if (bg.a > 0) res = { r: bg.r * bg.a + res.r * (1 - bg.a), g: bg.g * bg.a + res.g * (1 - bg.a), b: bg.b * bg.a + res.b * (1 - bg.a) }; } if (!res) res = { r: 255, g: 255, b: 255 }; let lightCount = 0; for (let c of chain) if (c && getLuminance(c) > 0.5) lightCount++; return { rgb: res, lum: getLuminance(res), depth: lightCount }; } const SKIP_TAGS = new Set(["IMG","VIDEO","AUDIO","CANVAS","SOURCE","TRACK","PICTURE","IFRAME","OBJECT","EMBED","SCRIPT","STYLE","LINK","META","NOSCRIPT","TEMPLATE","BASE","TITLE","HEAD","BR","WBR","HR","MAP","AREA","DATALIST","PARAM"]); const SVG_NS = "http://www.w3.org/2000/svg"; function setZsProp(el, prop, val, storeMap) { if (!storeMap.has(el)) storeMap.set(el, el.getAttribute("style") || ""); el.setAttribute(PROCESSED_ATTR, "1"); el.style.setProperty(prop, val, "important"); } function processElement(el, win, bgCache, storeMap) { if (el.hasAttribute && el.hasAttribute(PROCESSED_ATTR)) return; if (el.closest && el.closest('#zd-floating-sla-timer')) { el.setAttribute(PROCESSED_ATTR, "1"); return; } let isSvg = el.namespaceURI === SVG_NS; if (!isSvg && SKIP_TAGS.has(el.tagName)) { el.setAttribute(PROCESSED_ATTR, "1"); return; } let style = win.getComputedStyle(el); if (style.display === "none" || style.visibility === "hidden") return; if (isSvg) { for (let attr of ["fill", "stroke"]) { let c = parseColor(style[attr]); if (c && c.a > 0.2 && getLuminance(c) < 0.35) setZsProp(el, attr, toRgba(lightFill(c), 1), storeMap); } el.setAttribute(PROCESSED_ATTR, "1"); return; } if (el.closest && (el.closest('[data-chat-role]') || el.closest('[data-test-id="omni-log-item-message"]'))) { el.setAttribute(PROCESSED_ATTR, "1"); return; } let bgInfo = resolveEffectiveBg(el, bgCache, win); let hasBgImg = style.backgroundImage && style.backgroundImage !== "none"; let currentLum = bgInfo.lum; if (!hasBgImg && bgInfo.lum > 0.5) { let newRgb = darkBg(bgInfo.rgb, bgInfo.depth); setZsProp(el, "background-color", toRgba(newRgb, 1), storeMap); currentLum = getLuminance(newRgb); } for (let side of ["Top", "Right", "Bottom", "Left"]) { let bColor = parseColor(style["border" + side + "Color"]); if (bColor && bColor.a > 0.2 && getLuminance(bColor) > 0.5) { setZsProp(el, "border-" + side.toLowerCase() + "-color", toRgba(darkBorder(bColor), bColor.a), storeMap); } } let fgColor = parseColor(style.color); if (fgColor && fgColor.a > 0.2 && getLuminance(fgColor) < 0.45 && currentLum < 0.42) { setZsProp(el, "color", toRgba(lightText(fgColor), fgColor.a), storeMap); } el.setAttribute(PROCESSED_ATTR, "1"); } function batchProcess(list, doc, record) { let win = doc.defaultView, bgCache = new WeakMap(), idx = 0; record.running = true; let step = () => { if (!darkMode) { record.running = false; return; } let limit = Math.min(idx + 300, list.length); for (; idx < limit; idx++) { try { processElement(list[idx], win, bgCache, record.styles); } catch(e) {} } if (idx < list.length) setTimeout(step, 0); else { record.running = false; if (record.pending.size) scheduleBatch(doc); } }; step(); } function runTreeWalker(doc) { let record = docMap.get(doc); if (!record || record.running) return; let nodes = [], walker = doc.createTreeWalker(doc.documentElement, NodeFilter.SHOW_ELEMENT), node; while (node = walker.nextNode()) { if (!(node.hasAttribute && node.hasAttribute(PROCESSED_ATTR))) nodes.push(node); } if (nodes.length) batchProcess(nodes, doc, record); } function scheduleBatch(doc) { let record = docMap.get(doc); if (!record) return; clearTimeout(record.timer); record.timer = setTimeout(() => processPending(doc), 160); } function processPending(doc) { let record = docMap.get(doc); if (!record) return; if (!darkMode) { record.pending.clear(); return; } if (scanAllDocs(), record.running) { record.timer = setTimeout(() => processPending(doc), 200); return; } if (!record.pending.size) return; let list = [], visited = new Set(); for (let root of record.pending) { if (!root || root.nodeType !== 1 || visited.has(root)) continue; if (!(root.hasAttribute && root.hasAttribute(PROCESSED_ATTR))) { visited.add(root); list.push(root); } let walker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT), n; while (n = walker.nextNode()) { if (!visited.has(n) && !(n.hasAttribute && n.hasAttribute(PROCESSED_ATTR))) { visited.add(n); list.push(n); } } } record.pending.clear(); if (list.length) batchProcess(list, doc, record); } function attachObserver(doc) { let record = docMap.get(doc); if (!record || record.obs) return; let obs = new MutationObserver(mutations => { let rec = docMap.get(doc); if (!rec) return; let hasAdded = false; for (let m of mutations) { if (m.type === "childList") { for (let node of m.addedNodes) { if (node.nodeType === 1) { if (darkMode) rec.pending.add(node); hasAdded = true; } } } } if (hasAdded) { if (rec.tagTimer) clearTimeout(rec.tagTimer); rec.tagTimer = setTimeout(() => { tagAllMessages(doc); hideLeftPanelSections(doc); }, 50); if (darkMode) scheduleBatch(doc); } }); obs.observe(doc.documentElement, { childList: true, subtree: true }); record.obs = obs; } function classifyMessage(article, prevRole) { if (article.querySelector('[data-test-id="omni-log-internal-note-tag"]')) { return 'internal'; } const msgBox = article.querySelector('[data-test-id="omni-log-item-message"]'); if (msgBox) { const type = msgBox.getAttribute('type'); if (type === 'agent') return 'agent'; if (type === 'end-user') return 'customer'; if (type === 'bot') return 'bot'; if (type === 'internal') return 'internal'; } const hasAgentBadge = !!article.querySelector('[data-test-id="omni-log-avatar-badge-AgentBadge"]'); if (hasAgentBadge) return 'agent'; const senderEl = article.querySelector('[data-test-id="omni-log-item-sender"]'); const senderText = senderEl ? senderEl.textContent.trim().toLowerCase() : ''; if (senderText.includes('virtual assistant') || senderText.includes('bot') || senderText.includes('support bot')) { return 'bot'; } if (senderText.includes('arvin') || senderText.includes('hamza')) { return 'agent'; } if (senderText) { return 'customer'; } if (prevRole && prevRole !== 'internal') { return prevRole; } return 'customer'; } const SECTIONS_KEY = 'zd_hidden_sections'; let hiddenSections = (() => { try { let v = JSON.parse(safeStorage.getItem(SECTIONS_KEY)); if (Array.isArray(v)) return v.filter(x => typeof x === 'string'); } catch(e) {} return ['Tags', 'Also here']; })(); const saveHiddenSections = () => { try { safeStorage.setItem(SECTIONS_KEY, JSON.stringify(hiddenSections)); } catch(e) {} }; const normName = n => String(n || '').toLowerCase().trim(); const isHiddenName = n => hiddenSections.some(h => normName(h) === normName(n)); function findLeftPanes(doc) { const panes = []; try { const candidates = doc.querySelectorAll( '[data-test-id="component-type-TicketFieldsPane"], #ticket_sidebar, .grid-ticket-fields-panel, [data-test-id="column-1"], .ticket-panes-grid-layout > div:first-child' ); candidates.forEach(pane => { if (pane && !pane.querySelector('article[data-test-id="omni-log-comment-item"]')) { if (!panes.includes(pane)) panes.push(pane); } }); } catch(e) {} return panes; } function getSectionCols(doc) { const out = []; const panes = findLeftPanes(doc); const seenCols = new Set(); panes.forEach(pane => { let cols = []; try { cols = pane.querySelectorAll('[data-garden-id="grid.col"]'); } catch(e) {} cols.forEach(col => { try { if (seenCols.has(col)) return; if (col.closest('#' + TIMER_ID)) return; if (col.querySelector('[data-garden-id="grid.col"], [data-garden-id="grid.row"]')) return; if (col.querySelector('article, [data-test-id^="omni-log"], [contenteditable="true"]')) return; if (col.querySelector('[data-test-id="ticket-fields-tags"]')) return; let lbl = col.querySelector('label, legend, h3, h4, h5, [data-garden-id*="label"]'); let txt = lbl ? lbl.textContent.replace(/[*:]/g, '').trim() : ''; if (!txt) { const firstSpan = col.querySelector('span, div'); if (firstSpan && firstSpan.childNodes.length === 1 && firstSpan.childNodes[0].nodeType === 3) { txt = firstSpan.textContent.replace(/[*:]/g, '').trim(); } } if (txt && txt.length > 1 && txt.length < 35) { seenCols.add(col); out.push({ col, name: txt }); } } catch(e) {} }); }); return out; } function hideLeftPanelSections(doc) { if (!doc) return; try { const hideTags = isHiddenName('Tags'); const tagEls = []; doc.querySelectorAll('[data-test-id="ticket-fields-tags"]').forEach(tagField => { tagEls.push(tagField.closest('[data-garden-id="grid.col"]') || tagField.parentElement || tagField); }); doc.querySelectorAll('[data-test-id="ticket-system-field-tags-label"], [data-test-id="ticket-system-field-tags-multiselect"]').forEach(el => tagEls.push(el)); tagEls.forEach(el => { if (!el) return; if (hideTags) { el.style.setProperty('display', 'none', 'important'); el.setAttribute('data-zd-hidden-tags', 'true'); } else if (el.hasAttribute('data-zd-hidden-tags')) { el.style.removeProperty('display'); el.removeAttribute('data-zd-hidden-tags'); } }); } catch(e) {} try { const hideAlso = isHiddenName('Also here'); const leftPanes = findLeftPanes(doc); const searchRoots = leftPanes.length ? leftPanes : [doc.body]; searchRoots.forEach(leftPane => { if (!leftPane) return; const walker = doc.createTreeWalker(leftPane, NodeFilter.SHOW_TEXT, null, false); let node; const candidates = []; while ((node = walker.nextNode())) { const text = (node.textContent || '').trim().toLowerCase(); if ((text === 'also here' || text.startsWith('also here')) && node.parentElement && !node.parentElement.closest('#' + TIMER_ID)) { candidates.push(node.parentElement); } } candidates.forEach(el => { let container = el; while (container && container.parentElement) { const parent = container.parentElement; if (parent === leftPane || parent === doc.body || parent.id === 'ticket_sidebar' || (parent.className && typeof parent.className === 'string' && parent.className.includes('grid-ticket-fields-panel')) || parent.getAttribute('data-test-id') === 'component-type-TicketFieldsPane') { break; } const parentText = parent.textContent || ''; if (parentText.includes('Brand') || parentText.includes('Assignee') || parentText.includes('Followers') || parentText.includes('Ticket fields')) { break; } container = parent; } if (!container) return; const next = container.nextElementSibling; if (hideAlso) { container.style.setProperty('display', 'none', 'important'); container.setAttribute('data-zd-hidden-also-here', 'true'); if (next && (next.tagName === 'HR' || next.getAttribute('data-garden-id') === 'divider' || (next.clientHeight && next.clientHeight <= 3))) { next.style.setProperty('display', 'none', 'important'); next.setAttribute('data-zd-hidden-divider', 'true'); } } else { container.style.removeProperty('display'); container.removeAttribute('data-zd-hidden-also-here'); if (next && next.hasAttribute('data-zd-hidden-divider')) { next.style.removeProperty('display'); next.removeAttribute('data-zd-hidden-divider'); } } }); }); } catch(e) {} try { getSectionCols(doc).forEach(({ col, name }) => { if (isHiddenName(name)) { col.style.setProperty('display', 'none', 'important'); col.setAttribute('data-zd-hidden-custom', name); } else if (col.hasAttribute('data-zd-hidden-custom')) { col.style.removeProperty('display'); col.removeAttribute('data-zd-hidden-custom'); } }); } catch(e) {} } function applyAllSectionVisibility() { for (let d of collectDocs(document, [])) hideLeftPanelSections(d); } function scanAllSections() { const seen = new Map(); const add = n => { if (n && !seen.has(normName(n))) seen.set(normName(n), n); }; add('Tags'); add('Also here'); for (let d of collectDocs(document, [])) getSectionCols(d).forEach(x => add(x.name)); hiddenSections.forEach(add); return Array.from(seen.values()); } function tagAllMessages(doc) { if (!doc) return; try { const articles = doc.querySelectorAll('article[data-test-id="omni-log-comment-item"]'); let prevRole = 'customer'; articles.forEach(article => { const role = classifyMessage(article, prevRole); article.setAttribute('data-chat-role', role); const senderEl = article.querySelector('[data-test-id="omni-log-item-sender"]'); const timeEl = article.querySelector('[data-test-id="timestamp-relative"], [data-test-id="timestamp-absolute"]'); const msgBox = article.querySelector('[data-test-id="omni-log-item-message"]'); if (msgBox) { if (senderEl) msgBox.setAttribute('data-sender-name', senderEl.textContent.trim()); if (timeEl) msgBox.setAttribute('data-msg-time', timeEl.textContent.trim()); } prevRole = role; }); } catch(e) {} } function setupDoc(doc) { if (!doc || docMap.has(doc) || !doc.body || !doc.documentElement) return; try { doc.documentElement.classList.add("zskin-active"); if (darkMode) { doc.documentElement.classList.add("zskin-dark"); doc.documentElement.classList.remove("zskin-light"); } else { doc.documentElement.classList.remove("zskin-dark"); doc.documentElement.classList.add("zskin-light"); } let record = { sheet: injectLayoutAndColorCss(doc), styles: new Map(), pending: new Set(), timer: 0, running: false, obs: null }; docMap.set(doc, record); attachObserver(doc); tagAllMessages(doc); hideLeftPanelSections(doc); if (darkMode) { runTreeWalker(doc); } doc.addEventListener("load", e => { let t = e.target; if (t && t.tagName === "IFRAME") setTimeout(scanAllDocs, 200); }, true); } catch(e) {} } function scanAllDocs() { for (let d of collectDocs(document, [])) { setupDoc(d); try { d.documentElement.classList.add("zskin-active"); if (darkMode) { d.documentElement.classList.add("zskin-dark"); d.documentElement.classList.remove("zskin-light"); } else { d.documentElement.classList.remove("zskin-dark"); d.documentElement.classList.add("zskin-light"); } } catch(e) {} tagAllMessages(d); hideLeftPanelSections(d); } toggleCrossDomainSidePanels(darkMode); } function toggleCrossDomainSidePanels(turnOn) { let iframes = []; try { iframes = [...document.querySelectorAll('iframe')]; } catch(e) {} iframes.forEach(f => { try { if (!turnOn) { f.style.removeProperty('filter'); f.removeAttribute(FILTER_ATTR); } else { let r = f.getBoundingClientRect(); if (r.width > 150 && r.height > 150 && r.left > window.innerWidth * 0.55) { f.style.setProperty('filter', 'invert(.88) hue-rotate(180deg) brightness(.92) contrast(1.05)', 'important'); f.setAttribute(FILTER_ATTR, ''); } } } catch(e) {} }); } const TIMER_ID = 'zd-floating-sla-timer'; let timerIntervalId = 0; let audioCtx = null; let hasBeeped1Min = false; let manualResetTime = 0; let manualDurationOverride = 0; let lastAgentMsgId = ''; let macroDismissedId = ''; let activeMacroText = ''; let activeMacroList = []; let macroCopiedRecently = false; function escapeHtml(str) { if (!str) return ''; return String(str) .replace(/&/g, '&amp;') .replace(/</g, '&lt;') .replace(/>/g, '&gt;') .replace(/"/g, '&quot;') .replace(/'/g, '&#39;'); } const MUTE_KEY = 'zd_timer_muted'; const MACRO_KEY = 'zd_timer_macros_enabled'; let isMacrosEnabled = (() => { try { const value = safeStorage.getItem(MACRO_KEY); return value === null ? true : value === 'true'; } catch(e) {} return true; })(); let isMuted = (() => { try { return safeStorage.getItem(MUTE_KEY) === 'true'; } catch(e) {} return false; })(); const ticketFirstSeen = new Map();
+const ticketStates = new Map();
+
+function getTicketState(ticketKey) {
+  if (!ticketStates.has(ticketKey)) {
+    ticketStates.set(ticketKey, {
+      ticketKey,
+      ticketId: '',
+      displayBadge: '',
+      msgId: '',
+      rawTimeText: '',
+      baseElapsedSec: 0,
+      anchorTime: 0,
+      manualResetTime: 0,
+      manualDurationOverride: 0,
+      hasBeeped1Min: false,
+      macroDismissedId: '',
+      nativeSla: ''
+    });
+  }
+  return ticketStates.get(ticketKey);
+}
+
+const HOLD_REGEX = /\b(?:(?:[345]|three|four|five)(?:\s*(?:-|–|—|to|or|\/|-to-)\s*(?:[345]|three|four|five))?)\s*-?\s*(?:minutes?|mins?|m)\b/i;
+const ASSISTANCE_REGEX = /\b(?:further\s+(?:assistance|questions?)|(?:need|require)\s+assistance|anything\s+else|open\s+a\s+new\s+chat|end\s+(?:our|this)\s+chat|close\s+(?:our|this)\s+chat|haven['’]t\s+heard\s+(?:back|from\s+you)|hesitate\s+to\s+(?:reach\s+out|let\s+us\s+know|contact)|thank\s+you\s+(?:so\s+much\s+)?for\s+contacting)\b/i;
+
+function getAudioContext() {
+  try {
+    if (!audioCtx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) audioCtx = new AudioCtx();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+    return audioCtx;
+  } catch(e) {
+    return null;
+  }
+}
+
+function playTone(freq, duration, type = 'sine', volume = 0.22) {
+  if (isMuted) return;
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(volume, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  } catch(e) {}
+}
+
+function playOneMinuteWarning() {
+  playTone(880, 0.14, 'sine', 0.25);
+  setTimeout(() => playTone(1174, 0.22, 'sine', 0.28), 160);
+}
+
+function playUrgentBeep() {
+  playTone(740, 0.09, 'square', 0.22);
+  setTimeout(() => playTone(740, 0.09, 'square', 0.22), 140);
+}
+
+function getActiveTicketDetails() {
+  let ticketId = '';
+  let ticketKey = '';
+  let displayBadge = '';
+  let container = null;
+  let nativeSla = '';
+
+  try {
+    const tabSelectors = [
+      '[data-test-id="header-tab"][aria-selected="true"]',
+      '[data-test-id="tabs-section-nav-item-ticket"][aria-selected="true"]',
+      '[data-test-id="workspace-tab"][aria-selected="true"]',
+      '[data-test-id="tab-item"][aria-selected="true"]',
+      'div[role="tab"][aria-selected="true"]',
+      'button[role="tab"][aria-selected="true"]',
+      'li[role="tab"][aria-selected="true"]',
+      '[role="tab"][aria-selected="true"]'
+    ];
+
+    let activeTab = null;
+    for (const sel of tabSelectors) {
+      const found = document.querySelector(sel);
+      if (found) {
+        activeTab = found;
+        break;
+      }
+    }
+
+    if (activeTab) {
+      const controlsId = activeTab.getAttribute('aria-controls');
+      if (controlsId) {
+        container = document.getElementById(controlsId);
+      }
+
+      const entityId = activeTab.getAttribute('data-entity-id') || activeTab.getAttribute('data-ticket-id');
+      if (entityId && /^\d+$/.test(entityId)) {
+        ticketId = entityId;
+      }
+
+      if (!ticketId) {
+        const testId = activeTab.getAttribute('data-test-id') || '';
+        const m = testId.match(/(?:ticket-)?(\d{3,})/i);
+        if (m) ticketId = m[1];
+      }
+
+      if (!ticketId) {
+        const tabId = activeTab.getAttribute('id') || '';
+        const m = tabId.match(/(?:ticket-)?(\d{3,})/i);
+        if (m) ticketId = m[1];
+      }
+
+      if (!ticketId) {
+        const title = activeTab.getAttribute('title') || activeTab.getAttribute('aria-label') || '';
+        const m = title.match(/(?:ticket\s*#?|#)(\d{3,})/i);
+        if (m) ticketId = m[1];
+      }
+
+      if (!ticketId) {
+        const txt = activeTab.textContent || '';
+        const m = txt.match(/#?(\d{4,})/);
+        if (m) ticketId = m[1];
+      }
+    }
+
+    if (!container) {
+      const panelCandidates = Array.from(document.querySelectorAll(
+        '[role="tabpanel"]:not([aria-hidden="true"]), [data-test-id="workspace-tab"]:not([aria-hidden="true"]), [data-test-id="ticket-pane"]:not([aria-hidden="true"]), [data-test-id="component-type-MainConversationPane"]'
+      ));
+      for (const p of panelCandidates) {
+        if (p.offsetParent !== null || (p.getClientRects && p.getClientRects().length > 0)) {
+          container = p.closest('[role="tabpanel"], [data-test-id="workspace-tab"]') || p;
+          break;
+        }
+      }
+    }
+
+    if (!ticketId && container) {
+      const idEl = container.querySelector('[data-test-id*="ticket-id"], [data-test-id="ticket-sub-nav-item"], a[href*="/tickets/"]');
+      if (idEl) {
+        const href = idEl.getAttribute('href') || '';
+        const mHref = href.match(/\/tickets\/(\d+)/);
+        if (mHref) {
+          ticketId = mHref[1];
+        } else {
+          const mText = (idEl.textContent || '').match(/#?(\d{3,})/);
+          if (mText) ticketId = mText[1];
+        }
+      }
+      if (!ticketId) {
+        const headerText = (container.querySelector('header, [data-test-id*="header"], [data-test-id*="title"]') || {}).textContent || '';
+        const mHeader = headerText.match(/#(\d{4,})/);
+        if (mHeader) ticketId = mHeader[1];
+      }
+    }
+
+    if (!ticketId) {
+      const mPath = (window.location.pathname + window.location.hash + window.location.search).match(/\/tickets\/(\d+)/);
+      if (mPath) ticketId = mPath[1];
+    }
+
+    if (!ticketId) {
+      const mTitle = (document.title || '').match(/Ticket\s*#?(\d+)|#(\d{4,})/i);
+      if (mTitle) ticketId = mTitle[1] || mTitle[2];
+    }
+
+    if (!ticketId && activeTab) {
+      const tabText = (activeTab.textContent || '').trim().toLowerCase();
+      if (tabText.includes('new ticket') || tabText.includes('new')) {
+        ticketId = 'New';
+        ticketKey = 'new_' + (activeTab.id || 'tab');
+        displayBadge = 'New';
+      }
+    }
+
+    if (ticketId && ticketId !== 'New') {
+      ticketKey = 'ticket_' + ticketId;
+      displayBadge = '#' + ticketId;
+    } else if (!ticketKey) {
+      ticketKey = 'ticket_default';
+      displayBadge = 'Ticket';
+    }
+
+    const slaScope = container || document;
+    const slaEl = slaScope.querySelector('[data-test-id="ticket-sla-badge"], [data-test-id*="sla-badge"], [data-test-id*="sla-target"], [data-test-id*="sla-time"], [data-garden-id*="sla"]');
+    if (slaEl) {
+      const rawSla = (slaEl.textContent || slaEl.getAttribute('aria-label') || '').trim();
+      if (rawSla) nativeSla = rawSla;
+    }
+  } catch(e) {}
+
+  return { ticketId, ticketKey, displayBadge, container, nativeSla };
+}
+
+function isTicketOpen(container) {
+  const scope = container || document;
+  const hasComposer = !!scope.querySelector(
+    'textarea, [contenteditable="true"], [data-test-id*="composer"], [data-test-id*="editor"], [data-test-id="omni-composer-text-input"], [data-test-id="omni-log-composer-editor"]'
+  );
+  if (!hasComposer) {
+    const visibleComp = findZendeskComposer(container);
+    if (!visibleComp) return false;
+  }
+  const closedBadge = scope.querySelector('[data-test-id="status-badge-closed"]');
+  if (closedBadge) return false;
+  const statusView = scope.querySelector('[data-test-id*="status-view"], [data-test-id*="status-badge"]');
+  if (statusView) {
+    const txt = (statusView.textContent || '').toLowerCase();
+    if (txt.includes('solved') || txt.includes('closed')) return false;
+  }
+  return true;
+}
+
+function isRelativeTimeText(str) {
+  if (!str || typeof str !== 'string') return false;
+  const s = str.trim().toLowerCase();
+  return /\b(?:less than|under)\s+(?:a|1)\s+min(?:ute)?s?\b/i.test(s) ||
+         /\b(?:just now|right now|a moment ago|a few seconds? ago)\b/i.test(s) ||
+         /\b\d+\s*(?:sec(?:ond)?s?|min(?:ute)?s?|hours?|hrs?)\s+ago\b/i.test(s) ||
+         /\b(?:a|one)\s+(?:min(?:ute)?|second|hour)\s+ago\b/i.test(s);
+}
+
+function parseRelativeElapsedSeconds(rawStr) {
+  if (!rawStr || typeof rawStr !== 'string') return null;
+  const s = rawStr.trim().toLowerCase();
+  if (!s) return null;
+  if (/\b(?:less than|under)\s+(?:a|1)\s+min(?:ute)?s?\b/i.test(s)) return 0;
+  if (/\b(?:just now|right now|a moment ago|a few seconds? ago)\b/i.test(s)) return 0;
+  let m = s.match(/\b(\d+|a|one)\s*(?:seconds?|secs?)\s+ago\b/i);
+  if (m) {
+    return (m[1] === 'a' || m[1] === 'one') ? 1 : parseInt(m[1], 10);
+  }
+  m = s.match(/\b(\d+|a|one)\s*(?:minutes?|mins?)\s+ago\b/i);
+  if (m) {
+    const mins = (m[1] === 'a' || m[1] === 'one') ? 1 : parseInt(m[1], 10);
+    return mins * 60;
+  }
+  m = s.match(/\b(\d+|a|one)\s*(?:hours?|hrs?)\s+ago\b/i);
+  if (m) {
+    const hrs = (m[1] === 'a' || m[1] === 'one') ? 1 : parseInt(m[1], 10);
+    return hrs * 3600;
+  }
+  return null;
+}
+
+function getMessageRelativeTimeString(box) {
+  if (!box) return '';
+  const direct = box.getAttribute('data-msg-time');
+  if (direct && isRelativeTimeText(direct)) return direct.trim();
+  const article = box.closest('article[data-test-id="omni-log-comment-item"]');
+  const scope = article || box.parentElement || box;
+  const timeEl = scope.querySelector('[data-test-id="timestamp-relative"], [data-test-id*="timestamp"], time');
+  if (timeEl) {
+    const txt = (timeEl.textContent || '').trim();
+    if (isRelativeTimeText(txt)) return txt;
+    const aria = (timeEl.getAttribute('aria-label') || '').trim();
+    if (isRelativeTimeText(aria)) return aria;
+  }
+  const allEls = scope.querySelectorAll('*');
+  for (const el of allEls) {
+    if (el.children.length === 0) {
+      const txt = (el.textContent || '').trim();
+      if (isRelativeTimeText(txt)) return txt;
+    }
+  }
+  return '';
+}
+
+function getAgentMessages(container) {
+  const messages = [];
+  const scope = container || document;
+  try {
+    const boxes = Array.from(scope.querySelectorAll('[data-test-id="omni-log-item-message"]'));
+    for (const box of boxes) {
+      const boxType = (box.getAttribute('type') || '').toLowerCase();
+      const article = box.closest('article[data-test-id="omni-log-comment-item"]');
+      if (boxType === 'internal' || boxType === 'bot' || box.closest('[data-test-id="omni-log-internal-note-tag"], [type="internal"], [data-chat-role="internal"], [data-chat-role="bot"]')) continue;
+      let isAgent = boxType === 'agent' || (box.getAttribute('data-sender-type') || '').toLowerCase() === 'agent' || (box.getAttribute('data-chat-role') || '').toLowerCase() === 'agent' || !!(article && (article.getAttribute('data-chat-role') || '').toLowerCase() === 'agent');
+      if (!isAgent && article && article.querySelector('[data-test-id="omni-log-avatar-badge-AgentBadge"]')) {
+        isAgent = true;
+      }
+      if (!isAgent) continue;
+      const content = box.querySelector('[data-test-id="omni-log-message-content"]') || box;
+      const cleanContent = content.cloneNode(true);
+      cleanContent.querySelectorAll('button, svg, [data-test-id*="indicator"]').forEach(el => el.remove());
+      const text = cleanContent.textContent.trim();
+      const rawTime = getMessageRelativeTimeString(box);
+      const id = (article && article.getAttribute('data-event-id')) || box.getAttribute('data-event-id') || box.id || (text.slice(0, 40) + '_' + messages.length);
+      messages.push({ element: box, type: 'agent', rawTime, text, id });
+    }
+  } catch(e) {}
+  return messages;
+}
+
+function evaluateAgentSLA() {
+  const ticketInfo = getActiveTicketDetails();
+  if (!isTicketOpen(ticketInfo.container)) {
+    return {
+      isOpen: false,
+      ticketId: ticketInfo.ticketId,
+      ticketKey: ticketInfo.ticketKey,
+      displayBadge: ticketInfo.displayBadge,
+      nativeSla: ticketInfo.nativeSla,
+      durationSec: 0,
+      remainingSec: 0,
+      remainingMs: 0,
+      rule: 'idle',
+      label: 'Idle',
+      msgId: ''
+    };
+  }
+
+  const tState = getTicketState(ticketInfo.ticketKey);
+  tState.ticketId = ticketInfo.ticketId;
+  tState.displayBadge = ticketInfo.displayBadge;
+  tState.nativeSla = ticketInfo.nativeSla;
+
+  const agentMsgs = getAgentMessages(ticketInfo.container);
+  const scope = ticketInfo.container || document;
+  const allArticles = Array.from(scope.querySelectorAll('article[data-test-id="omni-log-comment-item"]'));
+
+  if (agentMsgs.length === 0) {
+    const durationSec = tState.manualDurationOverride > 0 ? tState.manualDurationOverride : 60;
+    const firstReplyKey = 'first_reply_' + ticketInfo.ticketKey;
+    if (tState.msgId !== firstReplyKey) {
+      tState.msgId = firstReplyKey;
+      tState.rawTimeText = '';
+      tState.hasBeeped1Min = false;
+      tState.macroDismissedId = '';
+      let custElapsed = 0;
+      if (allArticles.length) {
+        const lastArticle = allArticles[allArticles.length - 1];
+        const timeEl = lastArticle.querySelector('[data-test-id="timestamp-relative"], time');
+        const relStr = timeEl ? (timeEl.textContent || '').trim() : '';
+        const parsed = parseRelativeElapsedSeconds(relStr);
+        if (parsed !== null) custElapsed = parsed;
+      }
+      tState.baseElapsedSec = (tState.manualResetTime > 0 && Date.now() - tState.manualResetTime < 30000) ? 0 : custElapsed;
+      tState.anchorTime = Date.now();
+      tState.manualResetTime = 0;
+    }
+    const localSec = Math.max(0, Math.floor((Date.now() - tState.anchorTime) / 1000));
+    const totalElapsed = tState.baseElapsedSec + localSec;
+    const remainingSec = Math.max(0, durationSec - totalElapsed);
+    return {
+      isOpen: true,
+      ticketId: ticketInfo.ticketId,
+      ticketKey: ticketInfo.ticketKey,
+      displayBadge: ticketInfo.displayBadge,
+      nativeSla: ticketInfo.nativeSla,
+      durationSec,
+      remainingSec,
+      remainingMs: remainingSec * 1000,
+      rule: 'first_reply',
+      label: '1m First Reply',
+      msgId: firstReplyKey
+    };
+  }
+
+  const latestAgent = agentMsgs[agentMsgs.length - 1];
+  const lastAgentArticle = latestAgent.element ? latestAgent.element.closest('article[data-test-id="omni-log-comment-item"]') : null;
+  const lastAgentIndex = lastAgentArticle ? allArticles.indexOf(lastAgentArticle) : -1;
+
+  let customerRepliedAfter = false;
+  let latestCustArticle = null;
+  if (lastAgentIndex !== -1 && lastAgentIndex < allArticles.length - 1) {
+    for (let i = allArticles.length - 1; i > lastAgentIndex; i--) {
+      const art = allArticles[i];
+      const role = (art.getAttribute('data-chat-role') || '').toLowerCase();
+      const isInternal = !!art.querySelector('[data-test-id="omni-log-internal-note-tag"], [type="internal"]');
+      if (!isInternal && role !== 'agent' && role !== 'internal') {
+        customerRepliedAfter = true;
+        latestCustArticle = art;
+        break;
+      }
+    }
+  }
+
+  let durationSec = 120;
+  let rule = 'general';
+  let label = '2m Response';
+  let msgIdentifier = '';
+  let currentRawTime = '';
+
+  if (customerRepliedAfter && latestCustArticle) {
+    durationSec = 120;
+    rule = 'customer_reply';
+    label = '2m Response';
+    const timeEl = latestCustArticle.querySelector('[data-test-id="timestamp-relative"], time');
+    currentRawTime = timeEl ? (timeEl.textContent || '').trim() : '';
+    msgIdentifier = 'cust_reply_' + (latestCustArticle.getAttribute('data-event-id') || latestCustArticle.id || latestCustArticle.textContent.slice(0, 30));
+  } else {
+    const isHold = HOLD_REGEX.test(latestAgent.text);
+    const isAssistance = !isHold && ASSISTANCE_REGEX.test(latestAgent.text);
+    durationSec = isHold ? 300 : (isAssistance ? 60 : 120);
+    rule = isHold ? 'hold' : (isAssistance ? 'assistance' : 'general');
+    label = isHold ? '5m Hold' : (isAssistance ? '1m Assistance' : '2m Response');
+    msgIdentifier = (latestAgent.id || '') + '_agent_' + latestAgent.text.slice(0, 40);
+    currentRawTime = (latestAgent.rawTime || '').trim();
+  }
+
+  if (tState.manualDurationOverride > 0) {
+    durationSec = tState.manualDurationOverride;
+    label = `${Math.round(durationSec / 60)}m Manual`;
+  }
+
+  const parsedElapsed = parseRelativeElapsedSeconds(currentRawTime);
+
+  if (msgIdentifier !== tState.msgId) {
+    tState.msgId = msgIdentifier;
+    tState.rawTimeText = currentRawTime;
+    tState.hasBeeped1Min = false;
+    tState.macroDismissedId = '';
+    if (tState.manualResetTime > 0 && Date.now() - tState.manualResetTime < 30000) {
+      tState.baseElapsedSec = 0;
+    } else if (parsedElapsed !== null) {
+      tState.baseElapsedSec = parsedElapsed;
+    } else {
+      tState.baseElapsedSec = 0;
+    }
+    tState.anchorTime = Date.now();
+    tState.manualResetTime = 0;
+  } else {
+    if (currentRawTime && currentRawTime !== tState.rawTimeText && parsedElapsed !== null) {
+      tState.rawTimeText = currentRawTime;
+      if (parsedElapsed > tState.baseElapsedSec) {
+        tState.baseElapsedSec = parsedElapsed;
+        tState.anchorTime = Date.now();
+      }
+    }
+  }
+
+  const localSec = Math.max(0, Math.floor((Date.now() - tState.anchorTime) / 1000));
+  const totalElapsed = tState.baseElapsedSec + localSec;
+  const remainingSec = Math.max(0, durationSec - totalElapsed);
+
+  return {
+    isOpen: true,
+    ticketId: ticketInfo.ticketId,
+    ticketKey: ticketInfo.ticketKey,
+    displayBadge: ticketInfo.displayBadge,
+    nativeSla: ticketInfo.nativeSla,
+    durationSec,
+    remainingSec,
+    remainingMs: remainingSec * 1000,
+    rule,
+    label,
+    msgId: msgIdentifier
+  };
+}
+function findZendeskComposer(container) {
+  const selectors = [
+    '[data-test-id="omni-composer-text-input"]',
+    '[data-test-id="omni-log-composer-editor"] [contenteditable="true"]',
+    '[data-test-id="omni-log-composer-editor"]',
+    '[data-test-id*="composer"] [contenteditable="true"]',
+    '[data-test-id*="editor"] [contenteditable="true"]',
+    'div.ck-editor__editable[contenteditable="true"]',
+    'div[role="textbox"][contenteditable="true"]',
+    'div.zendesk-editor--rich-text-container [contenteditable="true"]',
+    'textarea[data-test-id*="composer"]',
+    'textarea[data-test-id*="editor"]',
+    'textarea[data-test-id*="text-input"]',
+    'textarea.zendesk-editor--textarea',
+    'textarea[name*="comment"]',
+    '[data-test-id*="composer"] textarea',
+    '[data-test-id*="editor"] textarea',
+    'div[contenteditable="true"]'
+  ];
+  if (container) {
+    for (const sel of selectors) {
+      try {
+        const els = container.querySelectorAll(sel);
+        for (const el of els) {
+          const visible = el.offsetParent !== null || el.getClientRects().length > 0;
+          const writable = el.tagName === 'TEXTAREA' || el.tagName === 'INPUT' || el.isContentEditable || el.getAttribute('contenteditable') === 'true' || el.getAttribute('role') === 'textbox';
+          if (visible && writable && !el.disabled && !el.readOnly) return el;
+        }
+      } catch(e) {}
+    }
+  }
+  for (const doc of collectDocs(document, [])) {
+    try {
+      for (const sel of selectors) {
+        const els = doc.querySelectorAll(sel);
+        for (const el of els) {
+          const visible = el.offsetParent !== null || el.getClientRects().length > 0;
+          const writable = el.tagName === 'TEXTAREA' || el.tagName === 'INPUT' || el.isContentEditable || el.getAttribute('contenteditable') === 'true' || el.getAttribute('role') === 'textbox';
+          if (visible && writable && !el.disabled && !el.readOnly) return el;
+        }
+      }
+    } catch(e) {}
+  }
+  return null;
+}
+
+function populateZendeskComposer(text) {
+  const ticketInfo = getActiveTicketDetails();
+  const el = findZendeskComposer(ticketInfo.container);
+  if (!el) return false;
+  const ownerDoc = el.ownerDocument || document;
+  const view = (ownerDoc && ownerDoc.defaultView) ? ownerDoc.defaultView : window;
+  try { el.focus(); } catch(e) {}
+  if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') {
+    try {
+      const proto = el.tagName === 'TEXTAREA' ? view.HTMLTextAreaElement.prototype : view.HTMLInputElement.prototype;
+      const nativeSetter = Object.getOwnPropertyDescriptor(proto, 'value');
+      if (nativeSetter && nativeSetter.set) {
+        nativeSetter.set.call(el, text);
+      } else {
+        el.value = text;
+      }
+    } catch(e) {
+      el.value = text;
+    }
+    try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch(e) {}
+    try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch(e) {}
+    return true;
+  }
+  if (el.isContentEditable || el.getAttribute('contenteditable') === 'true' || el.getAttribute('role') === 'textbox') {
+    let ok = false;
+    try {
+      el.focus();
+      const sel = view.getSelection ? view.getSelection() : window.getSelection();
+      const range = ownerDoc.createRange();
+      range.selectNodeContents(el);
+      if (sel) {
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+      ok = ownerDoc.execCommand('insertText', false, text);
+    } catch(e) {}
+    if (!ok || !el.textContent.includes(text.slice(0, 15))) {
+      try {
+        const paragraph = ownerDoc.createElement('p');
+        paragraph.textContent = text;
+        el.replaceChildren(paragraph);
+      } catch(e) {
+        el.textContent = text;
+      }
+      try {
+        if (view.InputEvent) {
+          el.dispatchEvent(new view.InputEvent('beforeinput', { bubbles: true, inputType: 'insertText', data: text }));
+          el.dispatchEvent(new view.InputEvent('input', { bubbles: true, inputType: 'insertText', data: text }));
+        }
+      } catch(e) {
+        try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch(e2) {}
+      }
+      try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch(e) {}
+    }
+    try {
+      if (el.ckeditorInstance && typeof el.ckeditorInstance.setData === 'function') {
+        el.ckeditorInstance.setData(`<p>${text}</p>`);
+      }
+    } catch(e) {}
+    try {
+      const sel = view.getSelection ? view.getSelection() : window.getSelection();
+      if (sel) {
+        const range = ownerDoc.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    } catch(e) {}
+    return true;
+  }
+  return false;
+}
+
+function setupSendResetListener() {
+  function handleSendTrigger(e) {
+    try {
+      const ticketInfo = getActiveTicketDetails();
+      const tState = getTicketState(ticketInfo.ticketKey);
+      if (e.type === 'keydown' && e.key === 'Enter' && !e.shiftKey) {
+        const comp = findZendeskComposer(ticketInfo.container);
+        if (comp && (e.target === comp || comp.contains(e.target))) {
+          tState.manualResetTime = Date.now();
+          tState.msgId = '';
+          tState.baseElapsedSec = 0;
+          tState.anchorTime = Date.now();
+          setTimeout(updateTimerDisplay, 80);
+        }
+      }
+      if (e.type === 'click') {
+        const btn = e.target.closest('[data-test-id*="send"], [data-test-id*="submit"], button[aria-label*="Send" i], [data-test-id="omni-composer-send-button"]');
+        if (btn) {
+          tState.manualResetTime = Date.now();
+          tState.msgId = '';
+          tState.baseElapsedSec = 0;
+          tState.anchorTime = Date.now();
+          setTimeout(updateTimerDisplay, 80);
+        }
+      }
+    } catch(err) {}
+  }
+  document.addEventListener('keydown', handleSendTrigger, true);
+  document.addEventListener('click', handleSendTrigger, true);
+  return function cleanupSendResetListener() {
+    document.removeEventListener('keydown', handleSendTrigger, true);
+    document.removeEventListener('click', handleSendTrigger, true);
+  };
+}
+let cleanupSendReset = null; function createFloatingTimerWidget() { if (document.getElementById(TIMER_ID)) return; const widget = document.createElement('div'); widget.id = TIMER_ID; widget.innerHTML = ` <div id="zd-timer-drag-handle" title="Drag to move (click clock to toggle keep-expanded)"> <button id="zd-timer-clock-btn" class="zd-timer-clock-icon-btn" type="button" title="Click clock to keep expanded"> <span id="zd-timer-icon"> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <circle cx="12" cy="12" r="10"></circle> <polyline points="12 6 12 12 16 14"></polyline> </svg> </span> <span id="zd-timer-collapsed-display" aria-hidden="true"></span> </button> </div> <div id="zd-timer-expandable"> <div id="zd-timer-info" title="Drag to move"> <span id="zd-timer-ticket" class="zd-timer-ticket-pill" title="Current Ticket">#--</span> <span id="zd-timer-display">--:--</span> <span id="zd-timer-badge">Auto</span> </div> <div id="zd-timer-controls"> <button id="zd-timer-sla-btn" class="zd-timer-pill zd-timer-sla-pill" type="button" style="display:none;" title="Active SLA (click to cycle 1m / 2m / 5m)">2m</button> <button id="zd-timer-btn-macro" class="zd-timer-pill" type="button" title="Toggle macro suggestions">⚡</button> <button id="zd-timer-btn-mute" class="zd-timer-pill" type="button" title="Toggle audio alert">🔔</button> <button id="zd-theme-toggle" class="zd-timer-pill" type="button" aria-pressed="true" title="Switch theme">☀️</button> </div> <div class="zd-sections-wrap"> <button id="zd-sections-toggle-btn" class="zd-timer-pill" title="Choose which left sidebar sections to show">Sidebar ▾</button> <div id="zd-sections-dropdown" style="display:none;"> <div class="zd-sections-head"> <span>Left sidebar sections</span> <button id="zd-sections-scan" class="zd-sec-mini-btn" title="Refresh section list">Scan</button> <button id="zd-sections-defaults" class="zd-sec-mini-btn" title="Hide Tags & Also here">Default</button> <button id="zd-sections-showall" class="zd-sec-mini-btn" title="Show all sections">All</button> </div> <div id="zd-sections-list"></div> </div> </div> </div> <div id="zd-timer-macro-popup" style="display:none;" title="Click to populate macro into chat"> <div class="zd-macro-popup-header"> <span id="zd-macro-popup-badge">⚡ Quick Macro</span> <button id="zd-macro-popup-close" class="zd-macro-popup-close" title="Dismiss" type="button">✕</button> </div> <div class="zd-macro-popup-body" id="zd-macro-popup-text"></div> </div> `; const styleEl = document.createElement('style'); styleEl.id = TIMER_ID + '-css'; styleEl.textContent = ` #${TIMER_ID} { position: fixed; z-index: 2147483647; display: flex; align-items: center; gap: 8px; padding: 5px 12px; height: 38px; max-width: 620px; background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 9999px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45); color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; user-select: none; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: max-width 0.42s cubic-bezier(0.16, 1, 0.3, 1), padding 0.32s cubic-bezier(0.16, 1, 0.3, 1), gap 0.32s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s, box-shadow 0.25s, background-color 0.25s, transform 0.15s ease; box-sizing: border-box; white-space: nowrap; overflow: visible; } html.zskin-light #${TIMER_ID} { background: rgba(255, 255, 255, 0.96); border: 1px solid rgba(0, 0, 0, 0.16); box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14); color: #0f172a; } #${TIMER_ID}:hover { border-color: rgba(56, 189, 248, 0.5); } html.zskin-light #${TIMER_ID}:hover { border-color: rgba(2, 132, 199, 0.45); } #${TIMER_ID} { overflow: visible !important; } #${TIMER_ID}.zd-animating { overflow: visible !important; } #${TIMER_ID}.zd-collapsed { width: 38px !important; min-width: 38px !important; max-width: 38px !important; height: 38px !important; padding: 0 !important; gap: 0 !important; justify-content: center !important; cursor: pointer; overflow: visible !important; } #${TIMER_ID}.zd-collapsed.zd-countdown-active { width: 66px !important; min-width: 66px !important; max-width: 66px !important; } #${TIMER_ID}.zd-collapsed.zd-macro-visible-collapsed { overflow: visible !important; } #zd-timer-collapsed-display { display: none; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 10px; font-weight: 700; letter-spacing: -0.2px; line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums; color: inherit; } #${TIMER_ID}.zd-collapsed.zd-countdown-active #zd-timer-icon { display: none !important; } #${TIMER_ID}.zd-collapsed.zd-countdown-active #zd-timer-collapsed-display { display: inline-flex; align-items: center; justify-content: center; } #${TIMER_ID}.zd-collapsed:hover { border-color: rgba(56, 189, 248, 0.7) !important; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6), 0 0 12px rgba(56, 189, 248, 0.45) !important; } html.zskin-light #${TIMER_ID}.zd-collapsed:hover { border-color: rgba(2, 132, 199, 0.7) !important; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22), 0 0 10px rgba(2, 132, 199, 0.35) !important; } #zd-timer-drag-handle { display: flex; align-items: center; justify-content: center; cursor: grab; flex-shrink: 0; } #zd-timer-drag-handle:active { cursor: grabbing; } #${TIMER_ID}.zd-collapsed #zd-timer-drag-handle { width: 100% !important; height: 100% !important; } .zd-timer-clock-icon-btn { background: transparent; border: 1px solid transparent; padding: 0; margin: 0; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; border-radius: 9999px; outline: none; color: inherit; font-size: 16px; line-height: 1; width: 26px; height: 26px; transition: transform 0.2s, background-color 0.2s, border-color 0.2s, box-shadow 0.2s; } .zd-timer-clock-icon-btn:hover { transform: scale(1.12); } .zd-timer-clock-icon-btn.zd-clock-pinned { background: rgba(56, 189, 248, 0.24); border-color: rgba(56, 189, 248, 0.6); box-shadow: 0 0 10px rgba(56, 189, 248, 0.45); } html.zskin-light .zd-timer-clock-icon-btn.zd-clock-pinned { background: rgba(2, 132, 199, 0.16); border-color: rgba(2, 132, 199, 0.5); box-shadow: 0 0 8px rgba(2, 132, 199, 0.35); } #zd-timer-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; color: #38bdf8; transform-origin: 50% 50%; transition: transform 0.48s cubic-bezier(0.2, 0.8, 0.25, 1), color 0.22s ease; transform: rotate(360deg); user-select: none; } #zd-timer-icon svg { display: block; width: 18px; height: 18px; flex-shrink: 0; } html.zskin-light #zd-timer-icon { color: #0284c7; } #${TIMER_ID}.zd-collapsed #zd-timer-icon { transform: rotate(0deg); } #${TIMER_ID}.zd-timer-warning #zd-timer-icon { color: #fbbf24 !important; } #${TIMER_ID}.zd-timer-urgent #zd-timer-icon { color: #ef4444 !important; } html.zskin-light #${TIMER_ID}.zd-timer-warning #zd-timer-icon { color: #d97706 !important; } html.zskin-light #${TIMER_ID}.zd-timer-urgent #zd-timer-icon { color: #dc2626 !important; } #zd-timer-expandable { display: flex; align-items: center; gap: 8px; max-width: 580px; opacity: 1; transform: translateX(0); transition: max-width 0.42s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.26s cubic-bezier(0.16, 1, 0.3, 1) 0.04s, transform 0.36s cubic-bezier(0.16, 1, 0.3, 1); } #${TIMER_ID}.zd-collapsed #zd-timer-expandable { max-width: 0 !important; opacity: 0 !important; transform: translateX(-14px) !important; overflow: hidden !important; pointer-events: none !important; visibility: hidden !important; margin: 0 !important; padding: 0 !important; transition: max-width 0.36s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease-in, transform 0.2s ease-in, visibility 0s 0.36s; } #zd-timer-info { display: flex; align-items: center; gap: 6px; padding-right: 8px; border-right: 1px solid rgba(255, 255, 255, 0.14); cursor: grab; } html.zskin-light #zd-timer-info { border-right: 1px solid rgba(0, 0, 0, 0.12); } #zd-timer-info:active { cursor: grabbing; } #zd-timer-macro-popup { position: absolute !important; left: calc(100% + 10px) !important; right: auto !important; top: 0 !important; width: 380px !important; max-width: 420px !important; background: #0f172a !important; border: 2px solid #ef4444 !important; border-radius: 12px !important; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7), 0 0 14px rgba(239, 68, 68, 0.4) !important; padding: 10px 12px !important; display: flex; flex-direction: column; gap: 6px !important; z-index: 2147483647 !important; color: #f8fafc !important; transition: border-color 0.2s, box-shadow 0.2s !important; box-sizing: border-box !important; white-space: normal !important; pointer-events: auto !important; } /* Removed hover bridge to prevent false pill hover when approaching macro */ #zd-timer-macro-popup::before { display: none !important; pointer-events: none !important; } #zd-timer-macro-popup:hover { border-color: #f87171 !important; box-shadow: 0 14px 36px rgba(0, 0, 0, 0.75), 0 0 18px rgba(239, 68, 68, 0.55) !important; } html.zskin-light #zd-timer-macro-popup { background: #ffffff !important; border-color: #ef4444 !important; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22), 0 0 12px rgba(239, 68, 68, 0.35) !important; color: #0f172a !important; } .zd-macro-popup-header { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 11px; font-weight: 700; color: #f87171; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap !important; margin-bottom: 2px; } html.zskin-light .zd-macro-popup-header { color: #dc2626; } .zd-macro-popup-subtitle { font-size: 10.5px; color: #94a3b8; margin-bottom: 4px; line-height: 1.3; } html.zskin-light .zd-macro-popup-subtitle { color: #64748b; } .zd-macro-popup-close { background: transparent; border: none; color: #94a3b8; font-size: 13px; font-weight: 700; cursor: pointer; padding: 2px 5px; border-radius: 4px; line-height: 1; } .zd-macro-popup-close:hover { color: #ffffff; background: rgba(255, 255, 255, 0.15); } html.zskin-light .zd-macro-popup-close:hover { color: #0f172a; background: rgba(0, 0, 0, 0.08); } .zd-macro-popup-body { display: flex; flex-direction: column; gap: 6px; } .zd-macro-option { font-size: 11.5px; line-height: 1.4; color: #f1f5f9 !important; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 7px; padding: 7px 9px; cursor: pointer !important; transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease; text-align: left; user-select: none; } .zd-macro-option:hover { background: rgba(56, 189, 248, 0.16) !important; border-color: #38bdf8 !important; transform: translateX(2px); } html.zskin-light .zd-macro-option { color: #0f172a !important; background: #f8fafc; border-color: #cbd5e1; } html.zskin-light .zd-macro-option:hover { background: #e0f2fe !important; border-color: #0284c7 !important; } .zd-macro-option-badge { display: block; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #38bdf8; margin-bottom: 2px; } html.zskin-light .zd-macro-option-badge { color: #0284c7; } .zd-macro-option-text { font-size: 11.5px; line-height: 1.4; word-break: normal; overflow-wrap: break-word; } 
+.zd-timer-ticket-pill {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: rgba(56, 189, 248, 0.18);
+  border: 1px solid rgba(56, 189, 248, 0.42);
+  color: #38bdf8;
+  letter-spacing: 0.2px;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+html.zskin-light .zd-timer-ticket-pill {
+  background: #e0f2fe;
+  border-color: #7dd3fc;
+  color: #0284c7;
+}
+ #zd-timer-display { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.5px; min-width: 48px; text-align: center; color: #38bdf8; } html.zskin-light #zd-timer-display { color: #0284c7; } #zd-timer-badge { font-size: 10px; font-weight: 600; text-transform: uppercase; padding: 2px 6px; border-radius: 9999px; background: rgba(255, 255, 255, 0.12); color: #94a3b8; letter-spacing: 0.3px; } html.zskin-light #zd-timer-badge { background: #e2e8f0; color: #475569; } #zd-timer-controls { display: flex; align-items: center; gap: 4px; } .zd-timer-pill { border: none; background: rgba(255, 255, 255, 0.08); color: #cbd5e1; padding: 3px 8px; border-radius: 9999px; cursor: pointer; font-size: 11px; font-weight: 600; transition: background-color 0.18s, color 0.18s, transform 0.12s; outline: none; } html.zskin-light .zd-timer-pill { background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; } .zd-timer-pill:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; transform: translateY(-1px); } html.zskin-light .zd-timer-pill:hover { background: #e2e8f0; color: #0f172a; } .zd-pill-off { opacity: 0.52 !important; background: rgba(255, 255, 255, 0.04) !important; } html.zskin-light .zd-pill-off { opacity: 0.52 !important; background: #f1f5f9 !important; color: #94a3b8 !important; } .zd-timer-sla-pill { background: rgba(56, 189, 248, 0.16) !important; border: 1px solid rgba(56, 189, 248, 0.42) !important; color: #38bdf8 !important; font-weight: 700 !important; padding: 3px 8px !important; letter-spacing: 0.3px; } .zd-timer-sla-pill:hover { background: rgba(56, 189, 248, 0.28) !important; border-color: rgba(56, 189, 248, 0.75) !important; color: #ffffff !important; transform: translateY(-1px); } html.zskin-light .zd-timer-sla-pill { background: rgba(2, 132, 199, 0.12) !important; border: 1px solid rgba(2, 132, 199, 0.35) !important; color: #0284c7 !important; } html.zskin-light .zd-timer-sla-pill:hover { background: rgba(2, 132, 199, 0.22) !important; color: #0369a1 !important; } #${TIMER_ID}.zd-timer-warning { border-color: #f59e0b !important; box-shadow: 0 0 16px rgba(245, 158, 11, 0.45) !important; } #${TIMER_ID}.zd-timer-warning #zd-timer-display { color: #fbbf24 !important; } #${TIMER_ID}.zd-timer-urgent { background: rgba(220, 38, 38, 0.95) !important; border-color: #ef4444 !important; box-shadow: 0 0 22px rgba(239, 68, 68, 0.8) !important; animation: zd-timer-pulse 0.9s infinite alternate; } #${TIMER_ID}.zd-timer-urgent #zd-timer-display, #${TIMER_ID}.zd-timer-urgent #zd-timer-badge { color: #ffffff !important; font-weight: 800 !important; } @keyframes zd-timer-pulse { 0% { transform: scale(1); filter: brightness(1); } 100% { transform: scale(1.03); filter: brightness(1.2); } } .zd-sections-wrap { position: relative; } #zd-sections-dropdown { position: absolute; width: 260px; max-height: 340px; right: 0; background: #0f172a; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); padding: 10px; flex-direction: column; gap: 8px; z-index: 1000000; color: #e2e8f0; } html.zskin-light #zd-sections-dropdown { background: #ffffff; border-color: #cbd5e1; box-shadow: 0 10px 30px rgba(0,0,0,0.18); color: #1e293b; } .zd-sections-head { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; border-bottom: 1px solid rgba(255, 255, 255, 0.12); padding-bottom: 6px; } html.zskin-light .zd-sections-head { border-bottom: 1px solid #e2e8f0; } .zd-sections-head span { flex: 1; color: #94a3b8; } html.zskin-light .zd-sections-head span { color: #64748b; } .zd-sec-mini-btn { background: rgba(255, 255, 255, 0.1); border: none; color: #cbd5e1; border-radius: 4px; padding: 2px 6px; font-size: 10px; cursor: pointer; } html.zskin-light .zd-sec-mini-btn { background: #f1f5f9; color: #334155; } .zd-sec-mini-btn:hover { background: rgba(255, 255, 255, 0.2); color: #fff; } html.zskin-light .zd-sec-mini-btn:hover { background: #e2e8f0; } #zd-sections-list { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; max-height: 260px; } #zd-sections-dropdown::before { content: ""; position: absolute; top: -12px; left: 0; right: 0; height: 14px; background: transparent; } .zd-section-item { display: flex; align-items: center; gap: 8px; font-size: 11px; padding: 4px 6px; border-radius: 6px; cursor: pointer; color: #f1f5f9 !important; } .zd-section-item * { color: #f1f5f9 !important; } .zd-section-item span { color: #f1f5f9 !important; font-weight: 500 !important; font-size: 11px !important; user-select: none; } .zd-section-item:hover { background: rgba(255, 255, 255, 0.12); } html.zskin-light .zd-section-item, html.zskin-light .zd-section-item *, html.zskin-light .zd-section-item span { color: #1e293b !important; } html.zskin-light .zd-section-item:hover { background: #f8fafc; } .zd-section-item input { margin: 0; cursor: pointer; } `; document.head.appendChild(styleEl); let savedPos = safeStorage.getItem('zd_timer_pos'); let posX = Math.max(16, window.innerWidth - 760); let posY = 12; if (savedPos) { try { const p = JSON.parse(savedPos); const sx = typeof p.left === 'number' ? p.left : (typeof p.x === 'number' ? p.x : null); const sy = typeof p.top === 'number' ? p.top : (typeof p.y === 'number' ? p.y : null); if (sx !== null && sy !== null) { posX = Math.min(Math.max(10, sx), Math.max(10, window.innerWidth - 140)); posY = Math.min(Math.max(5, sy), Math.max(5, window.innerHeight - 50)); } } catch(e) {} } widget.style.left = posX + 'px'; widget.style.top = posY + 'px'; widget.style.right = 'auto'; widget.style.bottom = 'auto'; (document.body || document.documentElement).appendChild(widget); const PIN_KEY = 'zd_timer_pinned'; let isPinned = (() => { try { const val = safeStorage.getItem(PIN_KEY); if (val !== null) return val === 'true'; const oldCol = safeStorage.getItem('zd_timer_collapsed'); if (oldCol === 'false') return true; } catch(e) {} return false; })(); let isPillHovered = false; let isMacroHovered = false; let suppressHover = false; let animTimeout = null; let hoverCollapseTimer = null; const dragHandle = widget.querySelector('#zd-timer-drag-handle'); const timerInfo = widget.querySelector('#zd-timer-info'); const clockBtn = widget.querySelector('#zd-timer-clock-btn'); const slaBtn = widget.querySelector('#zd-timer-sla-btn'); const setSlaButtonVisible = visible => { if (slaBtn) slaBtn.style.setProperty('display', visible ? 'inline-flex' : 'none', 'important'); }; setSlaButtonVisible(false); const macroPopup = widget.querySelector('#zd-timer-macro-popup'); function isEventOverMacro(e) { if (!macroPopup || macroPopup.style.display === 'none') return false; if (e && e.target && (e.target === macroPopup || macroPopup.contains(e.target))) return true; if (e && typeof e.clientX === 'number' && typeof e.clientY === 'number') { const el = document.elementFromPoint(e.clientX, e.clientY); if (el && (el === macroPopup || macroPopup.contains(el))) return true; } return false; } if (macroPopup) { macroPopup.addEventListener('mouseenter', () => { isMacroHovered = true; if (hoverCollapseTimer) { clearTimeout(hoverCollapseTimer); hoverCollapseTimer = null; } }); macroPopup.addEventListener('mouseleave', (e) => { isMacroHovered = false; if (e.relatedTarget && widget.contains(e.relatedTarget) && !macroPopup.contains(e.relatedTarget)) { isPillHovered = true; if (hoverCollapseTimer) { clearTimeout(hoverCollapseTimer); hoverCollapseTimer = null; } if (!isDragging && !suppressHover) { renderExpansion(true); } return; } if (isDragging || isPinned || isDropdownActive() || isPillHovered) return; if (hoverCollapseTimer) clearTimeout(hoverCollapseTimer); hoverCollapseTimer = setTimeout(() => { if (!isPillHovered && !isMacroHovered && !isPinned && !isDragging && !isDropdownActive()) { renderExpansion(true); } }, 300); }); } const dropdownMenu = widget.querySelector('#zd-sections-dropdown'); if (dropdownMenu) { dropdownMenu.addEventListener('mouseenter', () => { isPillHovered = true; if (hoverCollapseTimer) { clearTimeout(hoverCollapseTimer); hoverCollapseTimer = null; } }); } const macroBody = widget.querySelector('#zd-macro-popup-text'); function isMacroAlertActive() { return !!(macroPopup && macroPopup.style.display !== 'none'); } function isDropdownActive() { const dd = widget.querySelector('#zd-sections-dropdown'); return !!(dd && dd.style.display !== 'none'); } function shouldBeExpanded() { if (isPinned) return true; if (isDropdownActive()) return true; if (isPillHovered && !suppressHover) return true; return false; } function updateWidgetMetadata(isExp) { const displayEl = widget.querySelector('#zd-timer-display'); const badgeEl = widget.querySelector('#zd-timer-badge'); const ticketEl = widget.querySelector('#zd-timer-ticket'); const ticketText = (ticketEl && ticketEl.textContent && ticketEl.textContent !== 'Idle') ? `[${ticketEl.textContent}] ` : ''; const timeText = displayEl ? displayEl.textContent : ''; const badgeText = badgeEl ? badgeEl.textContent : ''; if (isPinned) { widget.classList.add('zd-pinned'); if (clockBtn) { clockBtn.classList.add('zd-clock-pinned'); clockBtn.title = 'Pinned open — Click clock to collapse into hover mode'; } } else { widget.classList.remove('zd-pinned'); if (clockBtn) { clockBtn.classList.remove('zd-clock-pinned'); clockBtn.title = isExp ? 'Click clock to keep expanded (drag to move)' : `SLA Timer: ${ticketText}${timeText} (${badgeText}) — Hover to peek, click to pin open`; } } if (!isExp) { widget.title = `SLA Timer: ${ticketText}${timeText} (${badgeText}) — Hover to peek, click to pin open (drag to move)`; } else { widget.removeAttribute('title'); } } function renderExpansion(animate = true) { const wantExpanded = shouldBeExpanded(); if (animate) { widget.classList.add('zd-animating'); if (animTimeout) clearTimeout(animTimeout); animTimeout = setTimeout(() => { if (widget && widget.classList) { widget.classList.remove('zd-animating'); } }, 450); } if (wantExpanded) { widget.classList.remove('zd-collapsed'); } else { widget.classList.add('zd-collapsed'); const dd = widget.querySelector('#zd-sections-dropdown'); if (dd) dd.style.display = 'none'; } widget.classList.toggle('zd-macro-visible-collapsed', !wantExpanded && isMacroAlertActive()); updateWidgetMetadata(wantExpanded); } function togglePin(forceState) { if (typeof forceState === 'boolean') { isPinned = forceState; } else { isPinned = !isPinned; } try { safeStorage.setItem(PIN_KEY, String(isPinned)); } catch(e) {} if (!isPinned) { suppressHover = true; } else { suppressHover = false; } renderExpansion(true); } widget.addEventListener('mouseenter', (e) => { if (isEventOverMacro(e)) { return; } isPillHovered = true; if (hoverCollapseTimer) { clearTimeout(hoverCollapseTimer); hoverCollapseTimer = null; } if (!isDragging && !suppressHover) { renderExpansion(true); } }); widget.addEventListener('mouseover', (e) => { if (isEventOverMacro(e)) { return; } if (!isPillHovered && !isDragging && !suppressHover) { isPillHovered = true; if (hoverCollapseTimer) { clearTimeout(hoverCollapseTimer); hoverCollapseTimer = null; } renderExpansion(true); } }); widget.addEventListener('mouseleave', (e) => { if (e.relatedTarget && widget.contains(e.relatedTarget)) { return; } isPillHovered = false; suppressHover = false; if (isDragging || isPinned || isDropdownActive() || isMacroHovered) return; if (hoverCollapseTimer) clearTimeout(hoverCollapseTimer); hoverCollapseTimer = setTimeout(() => { if (!isPillHovered && !isMacroHovered && !isPinned && !isDragging && !isDropdownActive()) { renderExpansion(true); } }, 300); }); let isDragging = false; let hasDragged = false; let dragStartX = 0; let dragStartY = 0; let widgetStartX = 0; let widgetStartY = 0; function onDragStart(e) { if (shouldBeExpanded() && e.target.closest('button') && !e.target.closest('#zd-timer-drag-handle')) { return; } isDragging = true; hasDragged = false; dragStartX = e.clientX; dragStartY = e.clientY; const rect = widget.getBoundingClientRect(); widgetStartX = rect.left; widgetStartY = rect.top; if (!e.target.closest('button')) { e.preventDefault(); } } if (dragHandle) dragHandle.addEventListener('mousedown', onDragStart); if (timerInfo) timerInfo.addEventListener('mousedown', onDragStart); window.addEventListener('mousemove', e => { if (!isDragging) return; const dx = e.clientX - dragStartX; const dy = e.clientY - dragStartY; if (Math.hypot(dx, dy) > 4) { hasDragged = true; } if (hasDragged) { const newX = Math.min(Math.max(10, widgetStartX + dx), window.innerWidth - widget.offsetWidth - 10); const newY = Math.min(Math.max(5, widgetStartY + dy), window.innerHeight - widget.offsetHeight - 10); widget.style.left = newX + 'px'; widget.style.top = newY + 'px'; } }); window.addEventListener('mouseup', () => { if (isDragging) { isDragging = false; if (hasDragged) { const rect = widget.getBoundingClientRect(); safeStorage.setItem('zd_timer_pos', JSON.stringify({ x: rect.left, y: rect.top })); } } }); if (clockBtn) { clockBtn.addEventListener('click', (e) => { e.stopPropagation(); if (hasDragged) { hasDragged = false; return; } togglePin(); }); } renderExpansion(false); if (slaBtn) { slaBtn.addEventListener('click', (e) => { e.stopPropagation(); getAudioContext(); const ticketInfo = getActiveTicketDetails(); const tState = getTicketState(ticketInfo.ticketKey); const state = evaluateAgentSLA(); const curSec = tState.manualDurationOverride || state.durationSec || 120; let nextSec = 120; if (curSec === 60) nextSec = 120; else if (curSec === 120) nextSec = 300; else if (curSec === 300) nextSec = 60; else nextSec = 120; tState.manualDurationOverride = nextSec; tState.hasBeeped1Min = false; tState.baseElapsedSec = 0; tState.anchorTime = Date.now(); updateTimerDisplay(); }); } const btnMute = widget.querySelector('#zd-timer-btn-mute'); const btnTheme = widget.querySelector('#zd-theme-toggle'); if (btnTheme) { btnTheme.textContent = darkMode ? '☀️' : '🌙'; btnTheme.title = darkMode ? 'Switch to light theme' : 'Switch to dark theme'; btnTheme.setAttribute('aria-pressed', String(darkMode)); } if (btnMute) { btnMute.textContent = isMuted ? '🔇' : '🔔'; btnMute.title = isMuted ? 'Audio muted (click to unmute)' : 'Audio active (click to mute)'; } btnMute.addEventListener('click', () => { isMuted = !isMuted; try { safeStorage.setItem(MUTE_KEY, String(isMuted)); } catch(e) {} btnMute.textContent = isMuted ? '🔇' : '🔔'; btnMute.title = isMuted ? 'Alerts muted (click to unmute)' : 'Alerts active (click to mute)'; updateTimerDisplay(); }); function positionMacroPopup() { const popup = widget.querySelector('#zd-timer-macro-popup'); if (!popup) return; popup.style.setProperty('left', 'calc(100% + 10px)', 'important'); popup.style.setProperty('right', 'auto', 'important'); const rect = widget.getBoundingClientRect(); if (rect.top + 320 > window.innerHeight) { popup.style.setProperty('top', 'auto', 'important'); popup.style.setProperty('bottom', '0', 'important'); } else { popup.style.setProperty('top', '0', 'important'); popup.style.setProperty('bottom', 'auto', 'important'); } } if (macroPopup) { macroPopup.addEventListener('click', (e) => { e.stopPropagation(); if (e.target.closest('#zd-macro-popup-close')) { e.stopPropagation(); const state = evaluateAgentSLA(); const curDuration = manualDurationOverride || state.durationSec || 120; macroDismissedId = (state.msgId || '') + '_' + curDuration; macroPopup.style.setProperty('display', 'none', 'important'); renderExpansion(true); return; } const optionEl = e.target.closest('.zd-macro-option'); if (!optionEl) return; const idx = parseInt(optionEl.getAttribute('data-macro-idx'), 10); const textToInsert = (activeMacroList && activeMacroList[idx]) ? activeMacroList[idx] : activeMacroText; if (!textToInsert) return; const inserted = populateZendeskComposer(textToInsert); if (!inserted) { if (macroBody) { macroBody.innerHTML = '<div style="color:#ef4444; font-weight:700; padding:6px; text-align:center;">Could not find the chat composer. Please open the reply box, then click again.</div>'; } return; } macroCopiedRecently = true; optionEl.style.setProperty('border-color', '#22c55e', 'important'); optionEl.style.setProperty('background', 'rgba(34, 197, 94, 0.22)', 'important'); if (macroBody) { macroBody.innerHTML = `<div style="color:#22c55e; font-weight:700; padding:10px 6px; text-align:center; font-size:12px;">✓ Added Format ${idx + 1} to chat composer! Review and send when ready.</div>`; } setTimeout(() => { const state = evaluateAgentSLA(); const curDuration = manualDurationOverride || state.durationSec || 120; macroDismissedId = (state.msgId || '') + '_' + curDuration; macroPopup.style.setProperty('display', 'none', 'important'); macroCopiedRecently = false; renderExpansion(true); }, 1100); }); } const btnMacro = widget.querySelector('#zd-timer-btn-macro'); function refreshMacroButton() { if (!btnMacro) return; btnMacro.textContent = isMacrosEnabled ? '⚡' : '⚡ Off'; btnMacro.title = isMacrosEnabled ? 'Macro suggestions: ON (click to turn OFF)' : 'Macro suggestions: OFF (click to turn ON)'; btnMacro.classList.toggle('zd-pill-off', !isMacrosEnabled); } if (btnMacro) { refreshMacroButton(); btnMacro.addEventListener('click', (e) => { e.stopPropagation(); isMacrosEnabled = !isMacrosEnabled; try { safeStorage.setItem(MACRO_KEY, isMacrosEnabled ? 'true' : 'false'); } catch(err) {} refreshMacroButton(); if (!isMacrosEnabled && macroPopup) { macroPopup.style.setProperty('display', 'none', 'important'); if (!shouldBeExpanded()) renderExpansion(true); } }); } btnTheme.addEventListener('click', () => { setThemeMode(!darkMode); }); const btnSections = widget.querySelector('#zd-sections-toggle-btn'); const dropdown = widget.querySelector('#zd-sections-dropdown'); const listEl = widget.querySelector('#zd-sections-list'); function renderSectionsList() { listEl.innerHTML = ''; scanAllSections().forEach(name => { const row = document.createElement('label'); row.className = 'zd-section-item'; const chk = document.createElement('input'); chk.type = 'checkbox'; chk.checked = !isHiddenName(name); chk.addEventListener('change', () => { hiddenSections = hiddenSections.filter(h => normName(h) !== normName(name)); if (!chk.checked) hiddenSections.push(name); saveHiddenSections(); applyAllSectionVisibility(); }); const txt = document.createElement('span'); txt.textContent = name; row.appendChild(chk); row.appendChild(txt); listEl.appendChild(row); }); } btnSections.addEventListener('click', e => { e.stopPropagation(); if (dropdown.style.display !== 'none') { dropdown.style.display = 'none'; return; } renderSectionsList(); const rect = widget.getBoundingClientRect(); if (rect.top > window.innerHeight - 380) { dropdown.style.top = 'auto'; dropdown.style.bottom = 'calc(100% + 10px)'; } else { dropdown.style.bottom = 'auto'; dropdown.style.top = 'calc(100% + 10px)'; } dropdown.style.display = 'flex'; renderExpansion(true); }); widget.querySelector('#zd-sections-scan').addEventListener('click', e => { e.stopPropagation(); renderSectionsList(); }); widget.querySelector('#zd-sections-defaults').addEventListener('click', e => { e.stopPropagation(); hiddenSections = ['Tags', 'Also here']; saveHiddenSections(); renderSectionsList(); applyAllSectionVisibility(); }); widget.querySelector('#zd-sections-showall').addEventListener('click', e => { e.stopPropagation(); hiddenSections = []; saveHiddenSections(); renderSectionsList(); applyAllSectionVisibility(); }); window.addEventListener('click', e => { if (widget.isConnected && !widget.contains(e.target)) { if (dropdown.style.display !== 'none') { dropdown.style.display = 'none'; if (!shouldBeExpanded()) { renderExpansion(true); } } } }); function updateTimerDisplay() { const displayEl = widget.querySelector('#zd-timer-display'); const badgeEl = widget.querySelector('#zd-timer-badge'); const ticketEl = widget.querySelector('#zd-timer-ticket'); if (!displayEl) return; const state = evaluateAgentSLA(); if (!state.isOpen) { if (ticketEl) { ticketEl.textContent = 'Idle'; ticketEl.title = 'No active ticket open'; ticketEl.style.opacity = '0.55'; } if (macroPopup) macroPopup.style.setProperty('display', 'none', 'important'); activeMacroText = ''; widget.classList.remove('zd-timer-warning', 'zd-timer-urgent'); displayEl.textContent = '⏸️ Idle'; const collapsedTimerEl = widget.querySelector('#zd-timer-collapsed-display'); if (collapsedTimerEl) collapsedTimerEl.textContent = ''; widget.classList.remove('zd-countdown-active'); if (badgeEl) badgeEl.textContent = 'Closed/Idle'; setSlaButtonVisible(false); updateWidgetMetadata(shouldBeExpanded()); return; } const activeDuration = state.durationSec || 120; const durMin = Math.round(activeDuration / 60); if (ticketEl) { ticketEl.style.opacity = '1'; ticketEl.textContent = state.displayBadge || ('#' + (state.ticketId || 'Ticket')); let tip = `Active Ticket: ${state.displayBadge || state.ticketId}`; if (state.nativeSla) tip += ` | Zendesk SLA: ${state.nativeSla}`; ticketEl.title = tip; } if (slaBtn) { setSlaButtonVisible(true); slaBtn.textContent = `${durMin}m`; slaBtn.title = `Active SLA for ${state.displayBadge}: ${durMin}m (click to cycle 1m / 2m / 5m)`; } const remainingSec = state.remainingSec; const remainingMs = state.remainingMs; if (isMuted) { widget.classList.remove('zd-timer-warning', 'zd-timer-urgent'); if (badgeEl) badgeEl.textContent = state.label; } else { if (remainingSec > 60) { widget.classList.remove('zd-timer-warning', 'zd-timer-urgent'); if (badgeEl) badgeEl.textContent = state.label; } else if (remainingSec > 10) { widget.classList.add('zd-timer-warning'); widget.classList.remove('zd-timer-urgent'); if (badgeEl) badgeEl.textContent = '⚠️ ' + state.label; const tState = getTicketState(state.ticketKey); if (!tState.hasBeeped1Min) { playOneMinuteWarning(); tState.hasBeeped1Min = true; } } else { widget.classList.remove('zd-timer-warning'); widget.classList.add('zd-timer-urgent'); if (badgeEl) badgeEl.textContent = '🚨 Urgent'; playUrgentBeep(); } } if (remainingSec > 0) { const m = Math.floor(remainingSec / 60); const s = remainingSec % 60; displayEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`; } else { displayEl.textContent = '00:00'; } const collapsedTimerEl = widget.querySelector('#zd-timer-collapsed-display'); if (collapsedTimerEl) collapsedTimerEl.textContent = displayEl.textContent; widget.classList.add('zd-countdown-active'); let targetMacroList = []; let targetMacroLabel = ''; if (state.isOpen) { if (state.rule === 'hold' || activeDuration === 300) { targetMacroLabel = "5m Extended Hold"; targetMacroList = [ "I am still looking into your account and can see that [] please allow me another 5 minutes. I will be back soon.", "Thank you for bearing with me. I'm still reviewing the details and need another 5 minutes. I'll update you shortly!", "I'm continuing to investigate this for you. Could you please allow me 5 more minutes? Appreciate your patience." ]; } else if (state.rule === 'general' || activeDuration === 120) { targetMacroLabel = "Hold Suggestion (3-5m)"; targetMacroList = [ "I need a few minutes to review your account. I’ll be back with an update in 3-5 minutes. Thanks for your patience!", "Allow me about 3 to 5 minutes to look into the details for you. I'll follow up shortly with an update.", "I'm checking into this for you right now. Please allow me 3-5 minutes and I'll be right back with more information." ]; } else { targetMacroList = []; targetMacroLabel = ''; } } const cycleKey = (state.msgId || '') + '_' + activeDuration; updateWidgetMetadata(shouldBeExpanded()); if (macroPopup) { if (!isMacrosEnabled || targetMacroList.length === 0) { macroPopup.style.setProperty('display', 'none', 'important'); } else if (targetMacroList.length > 0 && remainingMs <= 10000 && macroDismissedId !== cycleKey) { if (macroPopup.style.display === 'none' && !macroCopiedRecently) { activeMacroList = targetMacroList; activeMacroText = targetMacroList[0]; if (macroBody) { macroBody.innerHTML = ` <div class="zd-macro-popup-subtitle">Click any format to insert into reply:</div> ${targetMacroList.map((text, idx) => ` <div class="zd-macro-option" data-macro-idx="${idx}" title="Click to insert Format ${idx + 1}"> <span class="zd-macro-option-badge">Format ${idx + 1}</span> <div class="zd-macro-option-text">${escapeHtml(text)}</div> </div> `).join('')} `; } const badge = widget.querySelector('#zd-macro-popup-badge'); if (badge && badge.textContent !== `⚡ ${targetMacroLabel}`) { badge.textContent = `⚡ ${targetMacroLabel}`; } positionMacroPopup(); macroPopup.style.setProperty('display', 'flex', 'important'); } } else { if (macroPopup.style.display !== 'none' && !macroCopiedRecently) { macroPopup.style.setProperty('display', 'none', 'important'); if (!shouldBeExpanded()) { renderExpansion(true); } } } } } timerIntervalId = setInterval(updateTimerDisplay, 1000); cleanupSendReset = setupSendResetListener(); updateTimerDisplay(); } function setThemeMode(useDark) { darkMode = !!useDark; try { safeStorage.setItem(THEME_KEY, darkMode ? 'dark' : 'light'); } catch(e) {} for (const doc of collectDocs(document, [])) { try { let record = docMap.get(doc); doc.documentElement.classList.add("zskin-active"); if (darkMode) { doc.documentElement.classList.add("zskin-dark"); doc.documentElement.classList.remove("zskin-light"); if (!record) setupDoc(doc); else runTreeWalker(doc); } else { doc.documentElement.classList.remove("zskin-dark"); doc.documentElement.classList.add("zskin-light"); if (record) { clearTimeout(record.timer); record.pending.clear(); for (let [el, originalStyle] of record.styles) { try { if (!originalStyle) el.removeAttribute("style"); else el.setAttribute("style", originalStyle); } catch(e) {} } record.styles.clear(); } doc.querySelectorAll('[' + PROCESSED_ATTR + ']').forEach(el => { el.removeAttribute(PROCESSED_ATTR); try { if (el.style.backgroundColor && (el.style.backgroundColor.includes('rgb(24, 22, 22)') || el.style.backgroundColor.includes('rgb(14, 17, 22)'))) { el.style.removeProperty('background-color'); } } catch(e) {} }); } } catch(e) {} } toggleCrossDomainSidePanels(darkMode); const button = document.getElementById('zd-theme-toggle'); if (button) { button.textContent = darkMode ? '☀️' : '🌙'; button.title = darkMode ? 'Switch to light theme' : 'Switch to dark theme'; button.setAttribute('aria-pressed', String(darkMode)); } scanAllDocs(); console.info('[Zendesk Skin] ' + (darkMode ? 'Dark' : 'Light') + ' theme active.'); } function teardownTimerWidget() { if (timerIntervalId) clearInterval(timerIntervalId); if (typeof cleanupSendReset === 'function') { try { cleanupSendReset(); } catch(e) {} cleanupSendReset = null; } ticketStates.clear(); const widget = document.getElementById(TIMER_ID); if (widget) widget.remove(); const styleEl = document.getElementById(TIMER_ID + '-css'); if (styleEl) styleEl.remove(); } function showDeactivateToast() { try { const toast = document.createElement('div'); toast.id = 'zd-skin-deactivate-toast'; toast.textContent = '✓ Zendesk restored to original appearance'; toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0f172a;color:#f8fafc;padding:10px 18px;border-radius:9999px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:12px;font-weight:600;box-shadow:0 10px 25px rgba(0,0,0,0.4);z-index:2147483647;pointer-events:none;transition:opacity 0.3s;'; document.body.appendChild(toast); setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 350); }, 2000); } catch(e) {} } function teardown() { window.__zd_skin_teardown__ = null; teardownTimerWidget(); clearInterval(intervalId); toggleCrossDomainSidePanels(false); let allDocs = new Set(collectDocs(document, [])); for (let d of docMap.keys()) allDocs.add(d); for (let doc of allDocs) { let rec = docMap.get(doc); if (rec) { try { if (rec.obs) rec.obs.disconnect(); } catch(e) {} try { if (rec.sheet && doc.adoptedStyleSheets) { doc.adoptedStyleSheets = Array.from(doc.adoptedStyleSheets).filter(s => s !== rec.sheet); } } catch(e) {} clearTimeout(rec.timer); for (let entry of rec.styles) { let el = entry[0], orig = entry[1]; try { if (!orig) el.removeAttribute("style"); else el.setAttribute("style", orig); el.removeAttribute(PROCESSED_ATTR); } catch(e) {} } } try { doc.querySelectorAll("[data-zd-hidden-tags]").forEach(el => { el.style.removeProperty('display'); el.removeAttribute('data-zd-hidden-tags'); }); doc.querySelectorAll("[data-zd-hidden-also-here]").forEach(el => { el.style.removeProperty('display'); el.removeAttribute('data-zd-hidden-also-here'); }); doc.querySelectorAll("[data-zd-hidden-divider]").forEach(el => { el.style.removeProperty('display'); el.removeAttribute('data-zd-hidden-divider'); }); doc.querySelectorAll("[data-zd-hidden-custom]").forEach(el => { el.style.removeProperty('display'); el.removeAttribute('data-zd-hidden-custom'); }); doc.documentElement.classList.remove("zskin-dark"); doc.documentElement.classList.remove("zskin-light"); doc.documentElement.classList.remove("zskin-active"); doc.querySelectorAll("article[data-chat-role]").forEach(a => a.removeAttribute("data-chat-role")); doc.querySelectorAll("[data-sender-name]").forEach(el => { el.removeAttribute("data-sender-name"); el.removeAttribute("data-msg-time"); }); doc.querySelectorAll('[' + PROCESSED_ATTR + ']').forEach(el => el.removeAttribute(PROCESSED_ATTR)); let fallbackStyle = doc.getElementById(ID); if (fallbackStyle) fallbackStyle.remove(); } catch(e) {} docMap.delete(doc); } showDeactivateToast(); console.info("[Zendesk Skin] Original appearance restored."); } window.__zd_skin_teardown__ = teardown; scanAllDocs(); toggleCrossDomainSidePanels(darkMode); createFloatingTimerWidget(); window.addEventListener('click', () => getAudioContext(), { once: true, capture: true }); window.addEventListener('keydown', () => getAudioContext(), { once: true, capture: true }); document.addEventListener("load", e => { let t = e.target; if (t && t.tagName === "IFRAME") setTimeout(scanAllDocs, 200); }, true); intervalId = setInterval(() => { scanAllDocs(); toggleCrossDomainSidePanels(darkMode); if (!document.getElementById(TIMER_ID)) { createFloatingTimerWidget(); } }, 2500); console.info("[Zendesk Skin] WhatsApp style layout active."); })();

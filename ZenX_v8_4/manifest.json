@@ -1,0 +1,78 @@
+{
+  "manifest_version": 3,
+  "name": "ZenX \u2014 Premium Zendesk Workspace",
+  "version": "8.4.0",
+  "description": "ZenX themed tools, compact centered timer logo, unclipped idle conversations, and transparent native panels.",
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://*.zendesk.com/*"
+  ],
+  "action": {
+    "default_title": "ZenX Assistant",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "Icons/icon16.png",
+      "32": "Icons/icon32.png",
+      "48": "Icons/icon48.png",
+      "128": "Icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "Icons/icon16.png",
+    "32": "Icons/icon32.png",
+    "48": "Icons/icon48.png",
+    "128": "Icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.zendesk.com/*"
+      ],
+      "css": [
+        "styles.css",
+        "premium.css"
+      ],
+      "js": [
+        "content.js",
+        "themes.js",
+        "theme.js",
+        "workspace.js",
+        "app-frames.js",
+        "chrome-glass.js",
+        "effects.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://*.zendesk.com/*"
+      ],
+      "js": [
+        "app-frames.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true,
+      "match_about_blank": true,
+      "match_origin_as_fallback": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "wallpapers/*.jpg",
+        "cursors/*.png",
+        "styles.css",
+        "premium.css",
+        "Icons/*.png",
+        "wallpapers/*.png"
+      ],
+      "matches": [
+        "https://*.zendesk.com/*"
+      ]
+    }
+  ]
+}

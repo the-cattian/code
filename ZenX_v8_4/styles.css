@@ -1,0 +1,183 @@
+/* The exact bookmarklet v1.9 base appearance is injected by content.js.
+   This stylesheet is strictly a visual overlay and ticket-tab indicator. */
+html.zskin-active .zenx-tab-sla-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: none !important;
+  font: 700 10px/1.2 ui-monospace, SFMono-Regular, Consolas, monospace !important;
+  font-variant-numeric: tabular-nums !important;
+  padding: 4px 6px !important;
+  margin: 0 3px 0 5px !important;
+  border: 1px solid currentColor !important;
+  border-radius: 6px !important;
+  color: #22c55e !important;
+  background: rgba(34,197,94,.13) !important;
+  letter-spacing: 0 !important;
+  min-width: 36px !important;
+  pointer-events: none !important;
+}
+html.zskin-active [data-zenx-sla-level="warning"] > .zenx-tab-sla-badge {
+  color: #eab308 !important; background: rgba(234,179,8,.13) !important;
+}
+html.zskin-active [data-zenx-sla-level="critical"] > .zenx-tab-sla-badge,
+html.zskin-active [data-zenx-sla-level="overdue"] > .zenx-tab-sla-badge {
+  color: #f87171 !important; background: rgba(239,68,68,.17) !important;
+}
+html.zskin-active [data-zenx-sla-level="critical"] {
+  box-shadow: inset 0 -3px 0 rgba(249,115,22,.8) !important;
+}
+html.zskin-active [data-zenx-sla-level="overdue"] {
+  box-shadow: inset 0 -3px 0 rgba(239,68,68,.9) !important;
+}
+/* Only visual theming: no modifications to timestamp, message, or editor nodes. */
+html.zskin-active.zenx-custom-skin article[data-chat-role="agent"] [data-test-id="omni-log-item-message"] {
+  background: var(--zenx-agent) !important;
+  border-radius: var(--zenx-bubble-radius) !important;
+}
+html.zskin-active.zenx-custom-skin article[data-chat-role="customer"] [data-test-id="omni-log-item-message"] {
+  background: var(--zenx-customer) !important;
+  border-radius: var(--zenx-bubble-radius) !important;
+}
+html.zskin-active.zenx-custom-skin article[data-chat-role="bot"] [data-test-id="omni-log-item-message"] {
+  border-radius: var(--zenx-bubble-radius) !important;
+}
+html.zskin-active.zenx-custom-skin #zd-floating-sla-timer {
+  border-color: var(--zenx-accent) !important;
+  border-radius: var(--zenx-pill-radius) !important;
+}
+html.zskin-active.zenx-custom-skin #zd-floating-sla-timer #zd-timer-macro-popup {
+  border-radius: var(--zenx-popup-radius) !important;
+}
+html.zskin-active.zenx-custom-skin #zd-floating-sla-timer .zd-timer-ticket-pill {
+  color: var(--zenx-accent) !important;
+  border-color: var(--zenx-accent) !important;
+}
+/* Wallpaper is an overlay image on the pane itself; no extra DOM is created. */
+html.zskin-active.zenx-wallpaper-on [data-test-id="omni-log-container"],
+html.zskin-active.zenx-wallpaper-on [data-test-id="component-type-MainConversationPane"] {
+  background-image: linear-gradient(rgba(9, 14, 23, var(--zenx-wallpaper-dim, .85)), rgba(9, 14, 23, var(--zenx-wallpaper-dim, .85))), var(--zenx-wallpaper) !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html.zskin-active.zenx-wallpaper-on.zenx-wallpaper-motion [data-test-id="omni-log-container"] {
+    animation: zenx-wallpaper-drift 24s ease-in-out infinite alternate !important;
+  }
+}
+@keyframes zenx-wallpaper-drift {
+  from { background-position: 46% 48%; }
+  to   { background-position: 54% 52%; }
+}
+
+/* Visual-only palette; the SLA and ticket parsing functions never read these values. */
+html.zskin-active {
+  --zenx-agent:var(--zenx-agent-dark, #008069);
+  --zenx-customer:var(--zenx-customer-dark, #1e293b);
+  --zenx-va:var(--zenx-va-dark,#202b49);
+  --zenx-accent:var(--zenx-accent-dark,#38bdf8);
+}
+html.zskin-active.zskin-light {
+  --zenx-agent:var(--zenx-agent-light,#d9fdd3);
+  --zenx-customer:var(--zenx-customer-light,#ffffff);
+  --zenx-va:var(--zenx-va-light,#edf0ff);
+  --zenx-accent:var(--zenx-accent-light,#0284c7);
+}
+html.zskin-active.zenx-custom-skin article[data-chat-role="agent"] [data-test-id="omni-log-item-message"] {
+  background:var(--zenx-agent) !important;
+  border-radius:var(--zenx-bubble-radius,12px) !important;
+  color:var(--zenx-agent-text-dark,#fff) !important;
+}
+html.zskin-active.zskin-light.zenx-custom-skin article[data-chat-role="agent"] [data-test-id="omni-log-item-message"] {color:var(--zenx-agent-text-light,#15252b) !important;}
+html.zskin-active.zenx-custom-skin article[data-chat-role="customer"]:not([data-zenx-va="1"]) [data-test-id="omni-log-item-message"] {
+  background:var(--zenx-customer) !important;
+  border-radius:var(--zenx-bubble-radius,12px) !important;
+  color:var(--zenx-customer-text-dark,#edf4ff) !important;
+}
+html.zskin-active.zskin-light.zenx-custom-skin article[data-chat-role="customer"]:not([data-zenx-va="1"]) [data-test-id="omni-log-item-message"] {color:var(--zenx-customer-text-light,#182736) !important;}
+/* Keep VA a separate visual attribute. data-chat-role remains unchanged for bookmarklet SLA parity. */
+html.zskin-active article[data-zenx-va="1"] [data-test-id="omni-log-item-message"],
+html.zskin-active article[data-chat-role="bot"] [data-test-id="omni-log-item-message"] {
+  background:var(--zenx-va) !important;
+  border:1px solid color-mix(in srgb, var(--zenx-accent) 40%, transparent) !important;
+  border-radius:var(--zenx-bubble-radius,12px) !important;
+  color:#edf3ff !important;
+  -webkit-text-fill-color:#edf3ff !important;
+}
+html.zskin-active article[data-zenx-va="1"] [data-test-id="omni-log-item-message"] :is(div,span,p,li,a,strong,em,b,i),
+html.zskin-active article[data-chat-role="bot"] [data-test-id="omni-log-item-message"] :is(div,span,p,li,a,strong,em,b,i) {
+  color:#edf3ff !important;
+  -webkit-text-fill-color:#edf3ff !important;
+  background-color:transparent !important;
+}
+html.zskin-active.zskin-light article[data-zenx-va="1"] [data-test-id="omni-log-item-message"],
+html.zskin-active.zskin-light article[data-chat-role="bot"] [data-test-id="omni-log-item-message"] {
+  color:#202b45 !important;
+  -webkit-text-fill-color:#202b45 !important;
+}
+html.zskin-active.zskin-light article[data-zenx-va="1"] [data-test-id="omni-log-item-message"] :is(div,span,p,li,a,strong,em,b,i),
+html.zskin-active.zskin-light article[data-chat-role="bot"] [data-test-id="omni-log-item-message"] :is(div,span,p,li,a,strong,em,b,i) {
+  color:#202b45 !important;
+  -webkit-text-fill-color:#202b45 !important;
+}
+html.zskin-active article[data-zenx-va="1"] [data-test-id="omni-log-item-message"]::before {color:#a8c0ff !important; -webkit-text-fill-color:#a8c0ff !important;}
+html.zskin-active.zskin-light article[data-zenx-va="1"] [data-test-id="omni-log-item-message"]::before {color:#4c509c !important; -webkit-text-fill-color:#4c509c !important;}
+html.zskin-active article[data-zenx-va="1"] [data-test-id="omni-log-item-message"]::after {color:#b8c4d9 !important; -webkit-text-fill-color:#b8c4d9 !important;}
+html.zskin-active.zskin-light article[data-zenx-va="1"] [data-test-id="omni-log-item-message"]::after {color:#60758e !important; -webkit-text-fill-color:#60758e !important;}
+
+/* Preserve original agent/customer children without forcing unrelated button or card backgrounds. */
+html.zskin-active.zenx-custom-skin article[data-chat-role="agent"] [data-test-id="omni-log-message-content"],
+html.zskin-active.zenx-custom-skin article[data-chat-role="customer"]:not([data-zenx-va="1"]) [data-test-id="omni-log-message-content"] {color:inherit !important;}
+html.zskin-active.zenx-custom-skin article[data-chat-role="agent"] [data-test-id="omni-log-message-content"] :is(p,div,span,li,strong,em),
+html.zskin-active.zenx-custom-skin article[data-chat-role="customer"]:not([data-zenx-va="1"]) [data-test-id="omni-log-message-content"] :is(p,div,span,li,strong,em) {
+  color:inherit !important; -webkit-text-fill-color:currentColor !important; background:transparent !important;
+}
+/* Quick-reply chips retain legible labels on both modes. */
+html.zskin-active.zskin-dark [data-test-id*="quick-repl"] :is(button,[role="button"]),
+html.zskin-active.zskin-dark [data-test-id*="suggested-repl"] :is(button,[role="button"]) {color:#ecf3ff !important;background-color:#101b2d !important;}
+html.zskin-active.zskin-light [data-test-id*="quick-repl"] :is(button,[role="button"]),
+html.zskin-active.zskin-light [data-test-id*="suggested-repl"] :is(button,[role="button"]) {color:#17283c !important;background-color:#ffffff !important;}
+
+/* Right-side app SHELL only. Avoid blanket descendant div backgrounds that destroyed message contrast. */
+html.zskin-active.zskin-dark :is([data-test-id="component-type-AppsPane"],[data-test-id="ticket-apps-pane"],#apps_sidebar,[data-zenx-tool-root]) {
+  background:#111a27 !important;color:#e6edf7 !important;
+}
+html.zskin-active.zskin-light :is([data-test-id="component-type-AppsPane"],[data-test-id="ticket-apps-pane"],#apps_sidebar,[data-zenx-tool-root]) {
+  background:#fffaf5 !important;color:#202939 !important;
+}
+html.zskin-active.zskin-dark :is([data-test-id="component-type-AppsPane"],[data-test-id="ticket-apps-pane"],#apps_sidebar,[data-zenx-tool-root]) :is(input,textarea,select) {
+  color:#f1f5f9 !important;background:#131b29 !important;border-color:#33445a !important;
+}
+html.zskin-active.zskin-light :is([data-test-id="component-type-AppsPane"],[data-test-id="ticket-apps-pane"],#apps_sidebar,[data-zenx-tool-root]) :is(input,textarea,select) {
+  color:#203047 !important;background:#fff !important;border-color:#b8c4d1 !important;
+}
+
+/* Light wallpapers use light veils, not the old near-black overlay. */
+html.zskin-active.zskin-light.zenx-wallpaper-on [data-test-id="omni-log-container"],
+html.zskin-active.zskin-light.zenx-wallpaper-on [data-test-id="component-type-MainConversationPane"] {
+  background-image:linear-gradient(rgba(255,255,255,var(--zenx-light-veil,.13)),rgba(255,255,255,var(--zenx-light-veil,.13))),var(--zenx-wallpaper) !important;
+}
+
+/* Focus mode collapses *whole* side panes rather than hiding individual fields.
+   JS also fixes grid/flex column sizing so the conversation can occupy the released space. */
+html.zskin-active.zskin-focus-mode [data-zenx-focus-hidden="1"] {display:none !important;width:0 !important;min-width:0 !important;max-width:0 !important;flex:0 0 0 !important;}
+html.zskin-active.zskin-focus-mode [data-zenx-focus-grow="1"] {flex:1 1 auto !important;width:100% !important;max-width:100% !important;min-width:0 !important;}
+html.zskin-active.zskin-focus-mode [data-zenx-focus-grid="1"] {grid-template-columns:minmax(0,1fr) !important;}
+
+/* The themed cursor applies to blank surfaces; editors keep the standard I-beam and controls stay clickable. */
+html.zskin-active.zenx-cursor-enabled,
+html.zskin-active.zenx-cursor-enabled body,
+html.zskin-active.zenx-cursor-enabled [data-test-id="component-type-MainConversationPane"],
+html.zskin-active.zenx-cursor-enabled [data-test-id="omni-log-container"] {cursor:var(--zenx-cursor,auto) !important;}
+html.zskin-active.zenx-cursor-enabled :is(input,textarea,[contenteditable="true"]) {cursor:text !important;}
+html.zskin-active.zenx-cursor-enabled :is(button,a,[role="button"],select) {cursor:var(--zenx-cursor-pointer,pointer) !important;}
+
+/* Non-blocking cursor-follow and click effects. */
+#zenx-cursor-aura {position:fixed;left:0;top:0;width:54px;height:54px;border-radius:50%;z-index:2147483641;pointer-events:none;transform:translate(-100px,-100px);background:radial-gradient(circle,color-mix(in srgb,var(--zenx-accent) 27%,transparent),transparent 70%);opacity:.8;mix-blend-mode:screen;transition:opacity .18s ease;will-change:transform;}
+html.zskin-light #zenx-cursor-aura {mix-blend-mode:multiply;opacity:.42;}
+.zenx-click-particle {position:fixed;left:0;top:0;z-index:2147483642;pointer-events:none;line-height:1;animation:zenx-particle-out .85s ease-out forwards;filter:drop-shadow(0 2px 4px #0005);}
+.zenx-click-ring {position:fixed;border:2px solid var(--zenx-accent);border-radius:50%;width:10px;height:10px;z-index:2147483642;pointer-events:none;animation:zenx-ring-out .7s ease-out forwards;}
+@keyframes zenx-particle-out {0%{opacity:1;transform:translate(-50%,-50%) scale(.5)}55%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--rot)) scale(1.28)}}
+@keyframes zenx-ring-out {from{opacity:.75;transform:translate(-50%,-50%) scale(.1)}to{opacity:0;transform:translate(-50%,-50%) scale(7)}}
+@media(prefers-reduced-motion:reduce){#zenx-cursor-aura,.zenx-click-particle,.zenx-click-ring{display:none !important;}}

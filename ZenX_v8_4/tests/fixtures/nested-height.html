@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><base href="/tester/"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ZenX mock Zendesk</title><link rel="stylesheet" href="/tester/mock.css"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/premium.css"><style>
+body{height:100vh;min-height:0} .ticket-bar,.zendesk-top{padding-left:86px}
+#ticket-workspace{margin-left:72px} #native-assignee,#native-priority{width:100%;box-sizing:border-box}
+nav[data-test-id="support_nav"]{position:fixed;left:9px;top:120px;bottom:63px;width:54px;display:flex;flex-direction:column;gap:15px;background:#25202b;padding:9px;border-radius:16px}
+nav button{background:transparent;color:inherit;border:0;padding:10px 1px}
+.fixture-slot{min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.fixture-chat-shell{display:flex;flex-direction:column;height:100%;min-height:0;overflow:hidden;background:#111820}
+.fixture-chat-shell{flex:1;min-height:auto}.fixture-chat-shell .chat-area{height:220px;max-height:220px;flex:none}</style></head>
+<body id="fixture-active-ticket">
+  <div class="zendesk-top" data-test-id="header-toolbar"><div class="zendesk-brand">Z</div><div class="help-title">Support⌄</div><div class="active-ticket" id="active-tab" data-test-id="header-tab" aria-selected="true" aria-controls="fixture-active-ticket" data-entity-id="10501">Alex Customer <span>Ticket #10501</span></div><div class="tab">Another ticket ×</div><div class="top-spacer"></div><span>⌕</span><span>♢</span><button type="button" data-test-id="user-menu" aria-label="Agent profile"><img width="30" height="30" alt="Agent" src="/Icons/icon32.png"></button></div>
+  <div class="ticket-bar" data-test-id="ticket-top-bar"><span class="pill">No organization</span><span>Alex Customer</span><span class="ticket-badge" data-test-id="ticket-id" id="ticket-header">Ticket #10501</span><span id="ticket-status" data-test-id="status-badge-open">Open</span></div>
+  <nav data-test-id="support_nav" aria-label="Tools"><button type="button">Home</button><button type="button">Tools</button></nav><div id="ticket-workspace">
+    <div class="workspace-grid" data-test-id="component-type-TicketEditorLayout">
+      <div class="fixture-slot"><aside class="mock-fields" data-test-id="component-type-TicketFieldsPane">
+        <div class="fields-title">Ticket fields</div>
+        <label>Assignee<input id="native-assignee" class="fake-input" value="Support Agent" data-garden-id="forms.input"></label>
+        <label>Priority<select id="native-priority" class="fake-input" data-garden-id="forms.select"><option>Normal</option><option>High</option></select></label>
+        <label>Type<div class="fake-input">Question</div></label>
+        <label>Tags<div class="fake-input" data-test-id="ticket-fields-tags">customer_support</div></label>
+        <label>Status<div class="fake-input">Open</div></label>
+      </aside></div>
+      <div class="fixture-slot"><main class="mock-conversation" data-test-id="component-type-MainConversationPane">
+        <div class="conversation-heading" data-test-id="conversation-header"><div><strong>Conversation</strong><span>Via messaging</span></div><div class="top-actions">▣ &nbsp; ↻ &nbsp; ⋮</div></div>
+        <div class="fixture-chat-shell"><div class="fixture-chat-shell"><div class="chat-area" id="chat-area" data-test-id="omni-log-container"><div id="mock-messages"></div></div></div></div>
+        <div class="composer-wrap" data-test-id="omni-composer-container"><div class="composer" data-test-id="omni-composer-text-input" contenteditable="true" aria-label="Type a message here" data-placeholder="Write a message..." role="textbox"></div><button id="send-message" data-test-id="omni-composer-send-button" type="button">Send</button></div>
+      </main></div>
+      <div class="fixture-slot"><aside class="mock-apps" data-test-id="component-type-AppsPane"><div class="tool-tabs"><button type="button" id="sherpa-tab">Sherpa</button><button type="button" id="oracle-tab">Oracle</button></div><iframe id="mock-tool-frame" src="/tester/tool.html?app=sherpa" title="Mock Zendesk third-party tool"></iframe><div class="right-rail">♙<br>▤<br>☷<br>⊞<br>◈</div></aside></div>
+    </div>
+  </div>
+  <div class="ticket-footer" data-test-id="ticket-footer"><small>This is a simulated Zendesk ticket. No real messages are sent.</small><button id="toggle-closed">Close / reopen</button></div>
+  <script src="/tester/mock-shim.js"></script><script>chrome.runtime.getURL=path=>new URL("/"+path,location.href).href;</script>
+  <script src="/content.js"></script><script src="/themes.js"></script><script src="/theme.js"></script><script src="/workspace.js"></script><script src="/app-frames.js"></script><script src="/chrome-glass.js"></script><script src="/effects.js"></script><script src="/tester/mock.js"></script>
+</body></html>

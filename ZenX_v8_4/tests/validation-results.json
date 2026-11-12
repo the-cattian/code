@@ -1,0 +1,714 @@
+{
+  "results": [
+    {
+      "name": "grid 1917\u00d7940 layout",
+      "pass": true,
+      "detail": {
+        "workspaceTag": "grid",
+        "gaps": [
+          16,
+          16
+        ],
+        "padding": [
+          16,
+          16
+        ],
+        "columns": "328px 1048px 405px"
+      }
+    },
+    {
+      "name": "grid 1917 long log and composer",
+      "pass": true,
+      "detail": {
+        "scrollRange": 4421
+      }
+    },
+    {
+      "name": "grid 1672\u00d7941 layout",
+      "pass": true,
+      "detail": {
+        "workspaceTag": "grid",
+        "gaps": [
+          16,
+          16
+        ],
+        "padding": [
+          16,
+          16
+        ],
+        "columns": "328px 806.734px 401.266px"
+      }
+    },
+    {
+      "name": "grid 1672 long log and composer",
+      "pass": true,
+      "detail": {
+        "scrollRange": 5176
+      }
+    },
+    {
+      "name": "grid 1100\u00d7800 layout",
+      "pass": true,
+      "detail": {
+        "workspaceTag": "grid",
+        "gaps": [
+          12,
+          12
+        ],
+        "padding": [
+          12,
+          12
+        ],
+        "columns": "220px 500px 260px"
+      }
+    },
+    {
+      "name": "grid 1100 long log and composer",
+      "pass": true,
+      "detail": {
+        "scrollRange": 6821
+      }
+    },
+    {
+      "name": "grid 800\u00d7700 layout",
+      "pass": true,
+      "detail": {
+        "workspaceTag": "grid",
+        "gaps": [
+          12,
+          12
+        ],
+        "padding": [
+          12,
+          12
+        ],
+        "columns": "220px 340px 260px"
+      }
+    },
+    {
+      "name": "grid 800 long log and composer",
+      "pass": true,
+      "detail": {
+        "scrollRange": 9210
+      }
+    },
+    {
+      "name": "nested 1917\u00d7940 layout",
+      "pass": true,
+      "detail": {
+        "workspaceTag": "grid",
+        "gaps": [
+          16,
+          16
+        ],
+        "padding": [
+          16,
+          16
+        ],
+        "columns": "328px 1048px 405px"
+      }
+    },
+    {
+      "name": "nested 1917 long log and composer",
+      "pass": true,
+      "detail": {
+        "scrollRange": 4421
+      }
+    },
+    {
+      "name": "nested 1672\u00d7941 layout",
+      "pass": true,
+      "detail": {
+        "workspaceTag": "grid",
+        "gaps": [
+          16,
+          16
+        ],
+        "padding": [
+          16,
+          16
+        ],
+        "columns": "328px 806.734px 401.266px"
+      }
+    },
+    {
+      "name": "nested 1672 long log and composer",
+      "pass": true,
+      "detail": {
+        "scrollRange": 5176
+      }
+    },
+    {
+      "name": "nested 1100\u00d7800 layout",
+      "pass": true,
+      "detail": {
+        "workspaceTag": "grid",
+        "gaps": [
+          12,
+          12
+        ],
+        "padding": [
+          12,
+          12
+        ],
+        "columns": "220px 500px 260px"
+      }
+    },
+    {
+      "name": "nested 1100 long log and composer",
+      "pass": true,
+      "detail": {
+        "scrollRange": 6821
+      }
+    },
+    {
+      "name": "nested 800\u00d7700 layout",
+      "pass": true,
+      "detail": {
+        "workspaceTag": "grid",
+        "gaps": [
+          12,
+          12
+        ],
+        "padding": [
+          12,
+          12
+        ],
+        "columns": "220px 340px 260px"
+      }
+    },
+    {
+      "name": "nested 800 long log and composer",
+      "pass": true,
+      "detail": {
+        "scrollRange": 9210
+      }
+    },
+    {
+      "name": "flex 1917\u00d7940 layout",
+      "pass": true,
+      "detail": {
+        "workspaceTag": "flex",
+        "gaps": [
+          16,
+          16
+        ],
+        "padding": [
+          16,
+          16
+        ],
+        "columns": "195px minmax(0px, 1fr) 365px"
+      }
+    },
+    {
+      "name": "flex 1917 long log and composer",
+      "pass": true,
+      "detail": {
+        "scrollRange": 4421
+      }
+    },
+    {
+      "name": "flex 1672\u00d7941 layout",
+      "pass": true,
+      "detail": {
+        "workspaceTag": "flex",
+        "gaps": [
+          16,
+          16
+        ],
+        "padding": [
+          16,
+          16
+        ],
+        "columns": "195px minmax(0px, 1fr) 365px"
+      }
+    },
+    {
+      "name": "flex 1672 long log and composer",
+      "pass": true,
+      "detail": {
+        "scrollRange": 5176
+      }
+    },
+    {
+      "name": "flex 1100\u00d7800 layout",
+      "pass": true,
+      "detail": {
+        "workspaceTag": "flex",
+        "gaps": [
+          12,
+          12
+        ],
+        "padding": [
+          12,
+          12
+        ],
+        "columns": "195px minmax(0px, 1fr) 365px"
+      }
+    },
+    {
+      "name": "flex 1100 long log and composer",
+      "pass": true,
+      "detail": {
+        "scrollRange": 6821
+      }
+    },
+    {
+      "name": "flex 800\u00d7700 layout",
+      "pass": true,
+      "detail": {
+        "workspaceTag": "flex",
+        "gaps": [
+          12,
+          12
+        ],
+        "padding": [
+          12,
+          12
+        ],
+        "columns": "140px minmax(0px, 1fr) 240px"
+      }
+    },
+    {
+      "name": "flex 800 long log and composer",
+      "pass": true,
+      "detail": {
+        "scrollRange": 9210
+      }
+    },
+    {
+      "name": "nested-height 1917\u00d7940 layout",
+      "pass": true,
+      "detail": {
+        "workspaceTag": "grid",
+        "gaps": [
+          16,
+          16
+        ],
+        "padding": [
+          16,
+          16
+        ],
+        "columns": "328px 1048px 405px"
+      }
+    },
+    {
+      "name": "nested-height 1917 long log and composer",
+      "pass": true,
+      "detail": {
+        "scrollRange": 4421
+      }
+    },
+    {
+      "name": "nested-height 1672\u00d7941 layout",
+      "pass": true,
+      "detail": {
+        "workspaceTag": "grid",
+        "gaps": [
+          16,
+          16
+        ],
+        "padding": [
+          16,
+          16
+        ],
+        "columns": "328px 806.734px 401.266px"
+      }
+    },
+    {
+      "name": "nested-height 1672 long log and composer",
+      "pass": true,
+      "detail": {
+        "scrollRange": 5176
+      }
+    },
+    {
+      "name": "nested-height 1100\u00d7800 layout",
+      "pass": true,
+      "detail": {
+        "workspaceTag": "grid",
+        "gaps": [
+          12,
+          12
+        ],
+        "padding": [
+          12,
+          12
+        ],
+        "columns": "220px 500px 260px"
+      }
+    },
+    {
+      "name": "nested-height 1100 long log and composer",
+      "pass": true,
+      "detail": {
+        "scrollRange": 6821
+      }
+    },
+    {
+      "name": "nested-height 800\u00d7700 layout",
+      "pass": true,
+      "detail": {
+        "workspaceTag": "grid",
+        "gaps": [
+          12,
+          12
+        ],
+        "padding": [
+          12,
+          12
+        ],
+        "columns": "220px 340px 260px"
+      }
+    },
+    {
+      "name": "nested-height 800 long log and composer",
+      "pass": true,
+      "detail": {
+        "scrollRange": 9210
+      }
+    },
+    {
+      "name": "Navigation, header avatar, ticket use glass surfaces",
+      "pass": true,
+      "detail": {
+        "nav": {
+          "backdropFilter": "blur(22px) saturate(1.45)",
+          "borderRadius": "20px",
+          "boxShadow": "rgba(255, 255, 255, 0.13) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.024) 0px -1px 0px 0px inset, rgba(0, 0, 0, 0.267) 0px 12px 30px 0px"
+        },
+        "avatar": {
+          "backdropFilter": "blur(14px)",
+          "borderRadius": "50%",
+          "boxShadow": "rgba(255, 255, 255, 0.25) 0px 1px 0px 0px inset, color(srgb 1 0.741176 0.294118 / 0.19) 0px 0px 16px 0px"
+        },
+        "ticket": {
+          "backdropFilter": "blur(18px)",
+          "borderRadius": "12px",
+          "boxShadow": "rgba(255, 255, 255, 0.13) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.024) 0px -1px 0px 0px inset, rgba(0, 0, 0, 0.267) 0px 12px 30px 0px"
+        }
+      }
+    },
+    {
+      "name": "Native field edits persist through theme changes",
+      "pass": true
+    },
+    {
+      "name": "Native app tabs and iframe preserved",
+      "pass": true
+    },
+    {
+      "name": "Removed fields button and drawer functionality stay absent",
+      "pass": true
+    },
+    {
+      "name": "Focus mode occupies freed columns",
+      "pass": true,
+      "detail": {
+        "before": 810.734375,
+        "focus": 1568
+      }
+    },
+    {
+      "name": "Timer duration cycling, mute, pin, drag retained",
+      "pass": true,
+      "detail": {
+        "pin": "true",
+        "moved": [
+          -70,
+          40
+        ]
+      }
+    },
+    {
+      "name": "Light mode keeps native editor and pane sizes",
+      "pass": true
+    },
+    {
+      "name": "Closed ticket, short log, no composer retains readable chat",
+      "pass": true
+    },
+    {
+      "name": "Macro inserts a draft without sending",
+      "pass": true
+    },
+    {
+      "name": "Disabling and re-enabling restores native fields",
+      "pass": true
+    },
+    {
+      "name": "Alternate native pane selectors 1917",
+      "pass": true,
+      "detail": {
+        "fields": {
+          "top": 146,
+          "bottom": 876,
+          "left": 88,
+          "right": 416,
+          "width": 328,
+          "height": 730
+        },
+        "main": {
+          "top": 146,
+          "bottom": 876,
+          "left": 432,
+          "right": 1480,
+          "width": 1048,
+          "height": 730
+        },
+        "apps": {
+          "top": 146,
+          "bottom": 876,
+          "left": 1496,
+          "right": 1901,
+          "width": 405,
+          "height": 730
+        },
+        "workspace": {
+          "top": 130,
+          "bottom": 892,
+          "left": 72,
+          "right": 1917,
+          "width": 1845,
+          "height": 762
+        },
+        "surfaces": [
+          "fields",
+          "conversation",
+          "apps"
+        ]
+      }
+    },
+    {
+      "name": "Alternate native pane selectors 800",
+      "pass": true,
+      "detail": {
+        "fields": {
+          "top": 142,
+          "bottom": 880,
+          "left": 84,
+          "right": 304,
+          "width": 220,
+          "height": 738
+        },
+        "main": {
+          "top": 142,
+          "bottom": 880,
+          "left": 316,
+          "right": 656,
+          "width": 340,
+          "height": 738
+        },
+        "apps": {
+          "top": 142,
+          "bottom": 880,
+          "left": 668,
+          "right": 928,
+          "width": 260,
+          "height": 738
+        },
+        "workspace": {
+          "top": 130,
+          "bottom": 892,
+          "left": 72,
+          "right": 800,
+          "width": 728,
+          "height": 762
+        },
+        "surfaces": [
+          "fields",
+          "conversation",
+          "apps"
+        ]
+      }
+    },
+    {
+      "name": "Native profile and navigation clicks preserved",
+      "pass": true
+    },
+    {
+      "name": "All themes retain editable native controls and glass markers",
+      "pass": true,
+      "detail": {
+        "themeCount": 23
+      }
+    },
+    {
+      "name": "Docked macro popup fits viewport 1672",
+      "pass": true,
+      "detail": {
+        "x": 1279,
+        "y": 143,
+        "width": 380,
+        "height": 272.984375,
+        "styleMutations": 9
+      }
+    },
+    {
+      "name": "Dragged macro and sections dropdown fit viewport 1672",
+      "pass": true,
+      "detail": {
+        "macro": {
+          "x": 1229.3125,
+          "y": 493,
+          "width": 380,
+          "height": 272.984375
+        },
+        "sections": {
+          "x": 1348.0625,
+          "y": 492.484375,
+          "width": 260,
+          "height": 98
+        }
+      }
+    },
+    {
+      "name": "Docked macro popup fits viewport 800",
+      "pass": true,
+      "detail": {
+        "x": 407,
+        "y": 143,
+        "width": 380,
+        "height": 272.984375,
+        "styleMutations": 9
+      }
+    },
+    {
+      "name": "Dragged macro and sections dropdown fit viewport 800",
+      "pass": true,
+      "detail": {
+        "macro": {
+          "x": 357.3125,
+          "y": 142,
+          "width": 380,
+          "height": 272.984375
+        },
+        "sections": {
+          "x": 476.0625,
+          "y": 492.484375,
+          "width": 260,
+          "height": 98
+        }
+      }
+    },
+    {
+      "name": "Idle hidden composer releases the full nested chat height 1917",
+      "pass": true,
+      "detail": {
+        "gap": 1,
+        "composerDisplay": "none",
+        "empty": "1"
+      }
+    },
+    {
+      "name": "Idle hidden composer releases the full nested chat height 800",
+      "pass": true,
+      "detail": {
+        "gap": 1,
+        "composerDisplay": "none",
+        "empty": "1"
+      }
+    },
+    {
+      "name": "Composer actions stay visible when there is no editable field",
+      "pass": true
+    },
+    {
+      "name": "Actual nested scrollport fills idle card and shows the final internal-note line",
+      "pass": true,
+      "detail": {
+        "gap": 1,
+        "range": 4406
+      }
+    },
+    {
+      "name": "Idle logo is compact and centered in the native left rail",
+      "pass": true,
+      "detail": {
+        "timer": {
+          "x": 17,
+          "y": 451,
+          "width": 38,
+          "height": 38,
+          "cx": 36,
+          "cy": 470
+        },
+        "logo": {
+          "x": 25.953125,
+          "y": 460,
+          "width": 20,
+          "height": 20,
+          "cx": 35.953125,
+          "cy": 470
+        },
+        "button": {
+          "x": 17.953125,
+          "y": 452,
+          "width": 36,
+          "height": 36,
+          "cx": 35.953125,
+          "cy": 470
+        },
+        "nav": {
+          "x": 9,
+          "y": 120,
+          "width": 54,
+          "height": 757,
+          "cx": 36,
+          "cy": 498.5
+        },
+        "saved": {
+          "x": 10,
+          "y": 451
+        },
+        "collapsed": true,
+        "active": false
+      }
+    },
+    {
+      "name": "Removed ticket-fields overlay cannot return after DOM replacement",
+      "pass": true
+    },
+    {
+      "name": "Same-origin app switches, reloads and replacements use the selected theme",
+      "pass": true,
+      "detail": {
+        "first": {
+          "background": "rgba(5, 32, 48, 0.76)",
+          "color": "rgb(227, 255, 255)",
+          "theme": "ocean-glass",
+          "managed": "1",
+          "accent": "#56ead2",
+          "mode": "zskin-active zskin-dark zenx-wallpaper-on zenx-custom-skin zenx-premium zenx-cursor-enabled zenx-wallpaper-motion"
+        },
+        "switched": {
+          "background": "rgba(5, 32, 48, 0.76)",
+          "color": "rgb(227, 255, 255)",
+          "theme": "ocean-glass",
+          "managed": "1",
+          "accent": "#56ead2",
+          "mode": "zskin-dark zenx-wallpaper-on zenx-wallpaper-motion zenx-custom-skin zenx-premium zenx-cursor-enabled zskin-active"
+        },
+        "light": {
+          "background": "rgba(255, 255, 255, 0.86)",
+          "color": "rgb(40, 51, 65)",
+          "theme": "ocean-glass",
+          "managed": "1",
+          "accent": "#56ead2",
+          "mode": "zenx-wallpaper-on zenx-wallpaper-motion zenx-custom-skin zenx-premium zenx-cursor-enabled zskin-active zskin-light"
+        },
+        "styleWrites": 2
+      }
+    },
+    {
+      "name": "Cross-origin app switches keep one stable fallback without repeated inversion",
+      "pass": true,
+      "detail": {
+        "filter": "brightness(0.96) saturate(0.94) sepia(0.08) hue-rotate(0deg)",
+        "managed": true,
+        "readable": false
+      }
+    }
+  ],
+  "errors": []
+}

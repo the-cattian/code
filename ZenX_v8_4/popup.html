@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>ZenX v7 • Zendesk</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div class="brand"><img src="Icons/icon32.png" alt="" width="34" height="34"><div><h1>ZenX</h1><p>Bookmarklet-accurate SLA engine</p></div></div>
+      <div id="connection" class="connection offline">Connecting</div>
+    </header>
+    <nav class="nav" aria-label="Settings tabs">
+      <button id="nav-dashboard" class="nav-button selected" type="button">Dashboard</button>
+      <button id="nav-themes" class="nav-button" type="button">Themes</button>
+    </nav>
+    <section id="dashboard" class="view">
+      <section class="panel enable-row">
+        <div><h2>Enable ZenX</h2><p>Timer, macros, chat skin, sidebars</p></div>
+        <label class="switch" aria-label="Enable ZenX"><input id="enabled" type="checkbox" checked><span></span></label>
+      </section>
+      <section class="panel sla-panel">
+        <div class="section-heading"><span>ACTIVE TICKET</span><strong id="ticket-number">—</strong></div>
+        <div class="sla-main"><div id="countdown" class="countdown">--:--</div><div class="sla-meta"><span id="sla-rule" class="rule">Idle</span><small id="sla-native">Zendesk SLA: —</small></div></div>
+        <div class="section-heading sla-controls-heading"><span>MANUAL OVERRIDE</span><span class="subtle">Resets countdown like bookmarklet</span></div>
+        <div class="duration-row"><button data-duration="60" type="button">1 min</button><button data-duration="120" type="button">2 min</button><button data-duration="300" type="button">5 min</button><button data-duration="0" type="button">Auto</button></div>
+      </section>
+      <section class="panel"><div class="section-heading"><span>BEHAVIOR</span></div>
+        <div class="control-grid">
+          <button id="toggle-theme" class="control" type="button"><span class="glyph">◐</span><strong id="theme-mode">Dark mode</strong><small>Page appearance</small></button>
+          <button id="toggle-mute" class="control" type="button"><span class="glyph">♫</span><strong id="mute-mode">Sound on</strong><small>One-minute alerts</small></button>
+          <button id="toggle-macros" class="control" type="button"><span class="glyph">⚡</span><strong id="macro-mode">Macros on</strong><small>Direct composer insert</small></button>
+          <button id="toggle-focus" class="control" type="button"><span class="glyph">◎</span><strong id="focus-mode">Focus off</strong><small>Hide side panes and expand chat</small></button>
+        </div>
+      </section>
+      <section class="panel"><div class="section-heading"><span>SIDEBAR VISIBILITY</span><div class="inline-actions"><button id="sections-default" type="button">Default</button><button id="sections-all" type="button">Show all</button></div></div>
+        <p class="description">Hidden sections follow the bookmarklet’s original selectors.</p>
+        <div id="section-list" class="section-list"><span class="muted">Reading Zendesk sections…</span></div>
+      </section>
+      <div class="bottom-actions"><button id="rescan" type="button">Rescan Zendesk</button><button id="reload" type="button">Reload tab</button></div><div class="bottom-actions"><button id="open-tester" type="button">Open offline ZenX test environment</button></div>
+    </section>
+    <section id="themes" class="view hidden">
+      <section class="panel"><div class="section-heading"><span>THEME LIBRARY</span><span id="theme-count" class="subtle">20 presets</span></div><div id="theme-library" class="theme-library"></div></section>
+      <section class="panel theme-editor">
+        <div class="section-heading"><span>THEME EDITOR</span></div>
+        <label class="field">Theme name <input id="custom-name" type="text" maxlength="45" placeholder="Custom theme"></label>
+        <div class="color-grid"><label>Agent bubble <input id="agent-color" type="color"></label><label>Customer bubble <input id="customer-color" type="color"></label><label>VA bubble <input id="va-color" type="color"></label><label>Accent <input id="accent-color" type="color"></label></div>
+        <div class="two-col"><label class="field">Preferred appearance <select id="theme-preferred-mode"><option value="dark">Dark mode</option><option value="light">Light mode</option></select></label><label class="field">Theme sound <select id="theme-sound"><option value="original">Original</option><option value="bamboo">Bamboo</option><option value="bounce">Bounce</option><option value="cosmic">Cosmic</option><option value="neon">Neon</option><option value="bell">Bell</option><option value="wind">Wind</option><option value="tea">Tea garden</option><option value="glass">Glass</option><option value="sunrise">Sunrise</option><option value="wave">Ocean wave</option><option value="latte">Latte chime</option><option value="purr">Purr</option><option value="meow">Meow</option></select></label></div>
+        <div class="two-col"><label class="field">Cursor color (standard arrow & hand) <input id="cursor-color" type="color" value="#ffb549"></label><label class="field">Click effect <select id="theme-effect"><option value="ripple">Ripple</option><option value="paws">Paw prints</option><option value="hearts">Hearts</option><option value="sunbursts">Sunbursts</option><option value="slashes">Slashes</option><option value="orbits">Orbits</option><option value="digital">Digital</option><option value="petals">Petals</option><option value="embers">Embers</option><option value="bubbles">Bubbles</option><option value="droplets">Droplets</option><option value="sparkles">Sparkles</option><option value="paw-stars">Star paws</option><option value="leaves">Leaves</option></select></label></div>
+        <button id="preview-sound" type="button">Preview selected notification sound</button>
+        <div class="two-col">
+          <label class="field">Bubble corners <input id="bubble-radius" type="range" min="4" max="28" step="2"><output id="bubble-radius-value"></output></label>
+          <label class="field">HUD size <input id="ui-scale" type="range" min="85" max="115" step="5"><output id="ui-scale-value"></output></label>
+          <label class="field">Wallpaper dim <input id="wallpaper-dim" type="range" min="20" max="100" step="5"><output id="wallpaper-dim-value"></output></label>
+          <label class="field">Popup corners <input id="popup-radius" type="range" min="4" max="24" step="2"><output id="popup-radius-value"></output></label>
+        </div>
+        <label class="field">Floating timer shape <select id="pill-shape"><option value="pill">Round pill</option><option value="soft">Soft corners</option><option value="square">Square</option></select></label>
+        <label class="check-row"><input id="wallpaper-motion" type="checkbox"> Gentle wallpaper motion</label>
+        <label class="field">Custom wallpaper <small>JPG, PNG or WebP (stored only in your browser)</small><input id="wallpaper-file" type="file" accept="image/png,image/jpeg,image/webp"></label>
+        <button id="remove-wallpaper" class="text-button" type="button">Remove wallpaper</button>
+        <div id="theme-preview" class="theme-preview"><div class="preview-caption">PREVIEW</div><div class="preview-bubble va">Virtual Assistant message</div><div class="preview-bubble customer">Customer message</div><div class="preview-bubble agent">Your response</div></div>
+        <div class="theme-actions"><button id="apply-theme" class="primary" type="button">Apply to Zendesk</button><button id="save-theme" type="button">Save as custom</button></div>
+        <div class="minor-actions"><button id="delete-theme" type="button" disabled>Delete custom</button><button id="export-theme" type="button">Export JSON</button><button id="import-theme" type="button">Import JSON</button></div>
+      </section>
+    </section>
+    <footer><span id="message" role="status" aria-live="polite">Open a Zendesk ticket to get started.</span></footer>
+  </main>
+  <script src="themes.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

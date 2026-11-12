@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>ZenX v7 — Offline Test Lab</title><link rel="stylesheet" href="tester.css"></head>
+<body>
+<header class="top"><div class="brand"><img src="../Icons/icon48.png" alt="ZenX logo" width="37" height="37"><div><h1>ZenX <span>Test Lab</span></h1><small>Actual extension scripts • Simulated tickets • No Zendesk connection</small></div></div><div class="tools"><button id="reset" type="button">Reset demo</button><span class="test-badge">OFFLINE SANDBOX</span></div></header>
+<main class="layout">
+  <aside class="controls">
+    <div class="side-head"><strong>Appearance & behavior</strong><span id="status">Loading…</span></div>
+    <label class="control-label" for="theme">Theme selection</label>
+    <select id="theme"></select>
+    <div class="thumbnail" id="thumbnail"><span id="thumb-name">Select a theme</span></div>
+    <div class="button-row"><button id="toggle-mode" type="button">Switch light/dark</button><button id="toggle-focus" type="button">Focus: Off</button></div>
+    <div class="info-line">Move your cursor over the preview and click to test its cursor glow and theme-specific particles.</div>
+    <button id="sound" class="wide" type="button">Play this theme's notification</button>
+    <div class="meta-row"><span>Sound</span><strong id="sound-label">—</strong></div>
+    <div class="meta-row"><span>Cursor</span><strong id="cursor-label">—</strong></div>
+    <div class="meta-row"><span>Click effect</span><strong id="effect-label">—</strong></div>
+    <hr><h2>SLA scenarios</h2>
+    <div class="info-line">These scenarios use the extension's actual <code>evaluateAgentSLA()</code> implementation against fake Zendesk messages.</div>
+    <label class="control-label" for="scenario">Ticket scenario</label>
+    <select id="scenario">
+      <option value="first">First reply • 30 seconds elapsed</option>
+      <option value="general">Agent message • 1 minute elapsed</option>
+      <option value="hold">3–5 minute hold • 1 minute elapsed</option>
+      <option value="assistance">Further assistance • 5 seconds elapsed</option>
+      <option value="customer">Customer replied • 30 seconds elapsed</option>
+      <option value="bot">Virtual Assistant only • first reply</option>
+      <option value="closed">Closed ticket • Idle</option>
+    </select>
+    <div class="button-row"><button id="add-agent" type="button">Add agent reply</button><button id="add-customer" type="button">Add customer reply</button></div>
+    <div class="button-row"><button id="add-va" type="button">Add VA message</button><button id="switch-tool" type="button">Switch app</button></div>
+    <div class="duration-row"><button data-duration="60" type="button">1m</button><button data-duration="120" type="button">2m</button><button data-duration="300" type="button">5m</button><button data-duration="0" type="button">Auto</button></div>
+    <div class="sla-readout"><div><small>Original SLA rule</small><strong id="rule">—</strong></div><div><small>Countdown</small><strong id="countdown">--:--</strong></div></div>
+    <div class="test-notes"><strong>What this lab checks</strong><p>VA contrast, agent/customer messages, third-party app simulation, light/dark themes, cat themes, wallpapers, Focus mode, cursor and click effects, sounds and timer overrides.</p><p>It uses fake tickets. Third-party cross-origin apps and your private Zendesk DOM must still be tested in your actual workspace.</p></div>
+  </aside>
+  <section class="preview"><div class="preview-bar"><span><span class="dot"></span> Zendesk-style mock workspace</span><span>Local simulation • No real tickets</span></div><iframe id="stage" title="Isolated mock Zendesk workspace" src="mock.html"></iframe></section>
+</main>
+<script src="../themes.js"></script><script src="tester.js"></script>
+</body></html>

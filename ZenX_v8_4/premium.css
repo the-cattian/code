@@ -1,0 +1,268 @@
+/*
+ * ZenX 7 — premium workspace overlay.
+ * Deliberately VISUAL ONLY: no timestamps, message ordering, SLA calculations,
+ * Zendesk state changes, or synthetic Zendesk controls are performed in CSS.
+ * Keep third-party frames functional; where cross-origin, their own contents
+ * cannot legally/technically be restyled by a parent content script.
+ */
+html.zskin-active.zenx-premium {
+  --zx-accent: var(--zenx-theme-accent, #ffb549);
+  --zx-ink: #f8f0e8;
+  --zx-muted: #ac9b92;
+  --zx-shell: rgba(19, 14, 14, .93);
+  --zx-panel: rgba(28, 21, 20, .87);
+  --zx-panel-strong: rgba(22, 17, 17, .94);
+  --zx-control: rgba(30, 21, 18, .92);
+  --zx-border: color-mix(in srgb, var(--zx-accent) 37%, transparent);
+  --zx-edge: color-mix(in srgb, var(--zx-accent) 20%, transparent);
+  --zx-glow: color-mix(in srgb, var(--zx-accent) 19%, transparent);
+  --zx-radius: 19px;
+  --zx-layout-gap: 12px;
+  --zx-gutter: 14px;
+  --zx-wallpaper-overlay: rgba(8, 6, 7, .48);
+  --zx-shadow: 0 12px 36px rgba(0,0,0,.37), 0 0 23px var(--zx-glow);
+  background-color: #140f0e !important;
+  background-image: linear-gradient(var(--zx-wallpaper-overlay),var(--zx-wallpaper-overlay)), var(--zenx-wallpaper) !important;
+  background-position: center center !important;
+  background-size: cover !important;
+  background-attachment: fixed !important;
+  background-repeat: no-repeat !important;
+  color-scheme: dark;
+}
+
+/* Ocean Glass: luminous, spacious maritime glass. */
+html.zskin-active.zenx-premium[data-zenx-theme="ocean-glass"] {
+  --zx-ink: #e3ffff; --zx-muted:#8db7c9; --zx-shell:rgba(5,22,34,.91);
+  --zx-panel:rgba(5,32,48,.76); --zx-panel-strong:rgba(3,23,38,.91);
+  --zx-control:rgba(5,25,42,.89); --zx-radius:23px; --zx-layout-gap:14px;
+  --zx-wallpaper-overlay:rgba(0,15,25,.48);
+}
+/* Mountain Sunrise: soft sunrise, airy white glass with warm gilded edges. */
+html.zskin-active.zskin-light.zenx-premium,
+html.zskin-active.zenx-premium[data-zenx-theme="mountain-sunrise"] {
+  --zx-ink:#2b2b37; --zx-muted:#687486; --zx-shell:rgba(253,250,250,.96);
+  --zx-panel:rgba(255,251,248,.87); --zx-panel-strong:rgba(255,255,255,.94);
+  --zx-control:rgba(255,255,255,.88); --zx-edge:rgba(102,104,122,.20);
+  --zx-glow:color-mix(in srgb,var(--zx-accent) 18%,transparent);
+  --zx-shadow:0 10px 30px rgba(70,68,106,.12),0 0 18px var(--zx-glow);
+  --zx-wallpaper-overlay:rgba(255,251,252,.13);
+  color-scheme:light;
+}
+/* Split Focus: dense, squared-off, enterprise control-center layout. */
+html.zskin-active.zenx-premium[data-zenx-theme="split-focus-pro"] {
+  --zx-ink:#e5f1f4; --zx-muted:#99bbc4; --zx-shell:rgba(9,24,32,.98);
+  --zx-panel:rgba(9,30,40,.90); --zx-panel-strong:rgba(8,25,33,.96);
+  --zx-control:rgba(7,32,42,.94); --zx-radius:11px; --zx-layout-gap:8px;
+  --zx-shadow:0 7px 21px rgba(0,0,0,.34);
+  --zx-wallpaper-overlay:rgba(4,15,24,.72);
+}
+/* Neo Cyber: deep purple glass with magenta/lilac and teal illumination. */
+html.zskin-active.zenx-premium[data-zenx-theme="neo-cyber"] {
+  --zx-ink:#fff0ff; --zx-muted:#c0a6d2; --zx-shell:rgba(18,10,36,.93);
+  --zx-panel:rgba(26,18,50,.80); --zx-panel-strong:rgba(15,14,37,.94);
+  --zx-control:rgba(23,18,53,.93); --zx-radius:19px;
+  --zx-wallpaper-overlay:rgba(10,5,31,.49);
+  --zx-shadow:0 14px 38px rgba(4,2,21,.51),0 0 30px var(--zx-glow);
+}
+html.zskin-active.zenx-premium[data-zenx-theme="cat-photo"] {
+  --zx-ink:#fff0f8; --zx-muted:#d2b0c0;
+  --zx-shell:rgba(30,18,29,.92); --zx-panel:rgba(42,27,40,.82);
+  --zx-panel-strong:rgba(29,20,31,.94); --zx-control:rgba(46,28,47,.92);
+  --zx-wallpaper-overlay:rgba(17,11,19,.63);
+}
+/* Other pre-existing themes retain their theme settings but benefit from consistent surfaces. */
+html.zskin-active.zenx-premium.zskin-light:not([data-zenx-theme="mountain-sunrise"]) {
+  --zx-ink:#283341; --zx-muted:#65768a; --zx-shell:rgba(253,253,254,.96);
+  --zx-panel:rgba(255,255,255,.86); --zx-panel-strong:rgba(254,255,255,.95);
+  --zx-control:rgba(250,252,255,.92); --zx-border:rgba(84,103,134,.25);
+  --zx-edge:rgba(60,85,114,.16); --zx-glow:rgba(63,100,150,.12);
+  --zx-shadow:0 8px 28px rgba(25,50,88,.12);
+}
+
+/* Shell and chrome: scoped to Zendesk's recognizable workspace regions. */
+html.zskin-active.zenx-premium body {
+  background-color:transparent !important;
+  color:var(--zx-ink) !important;
+}
+/* v8.3: native shell markers cover grid, flex and wrapped layouts. */
+html.zskin-active.zenx-premium {
+ --zx-accent:var(--zenx-accent,var(--zenx-theme-accent,#ffb549));
+ --zx-ink:#f7f3ed;--zx-muted:#bdb5ad;--zx-shell:rgba(18,18,20,.72);--zx-panel:rgba(23,23,25,.76);
+ --zx-panel-strong:rgba(19,19,21,.88);--zx-control:rgba(22,22,24,.68);
+ --zx-border:color-mix(in srgb,var(--zx-accent) 27%,rgba(255,255,255,.25));--zx-edge:rgba(255,255,255,.17);
+ --zx-radius:22px;--zx-layout-gap:16px;--zx-outer-gutter:16px;--zx-chat-veil:rgba(10,10,14,.24);
+ --zx-shadow:inset 0 1px 0 #ffffff21,inset 0 -1px 0 #ffffff06,0 12px 30px #0004;
+ --zx-wallpaper-overlay:rgba(9,9,12,.40);
+ background:linear-gradient(var(--zx-wallpaper-overlay),var(--zx-wallpaper-overlay)),var(--zenx-wallpaper) center/cover fixed no-repeat #111 !important;
+}
+html.zskin-active.zenx-premium.zskin-light {
+ --zx-ink:#283341;--zx-muted:#596779;--zx-shell:rgba(253,253,254,.76);--zx-panel:rgba(255,255,255,.79);
+ --zx-panel-strong:rgba(255,255,255,.91);--zx-control:rgba(255,255,255,.80);--zx-edge:rgba(55,67,80,.2);
+ --zx-border:color-mix(in srgb,var(--zx-accent) 28%,rgba(55,67,80,.22));--zx-shadow:inset 0 1px 0 #fffd,0 10px 28px #3030501c;
+ --zx-wallpaper-overlay:rgba(255,255,255,.12);--zx-chat-veil:rgba(255,255,255,.14);
+}
+html.zskin-active.zenx-premium body,
+html.zskin-active.zenx-premium :is(#root,#app,#zendesk_app,[data-zenx-clear-surface]) {background-color:transparent !important;}
+/* Border-box includes all four gutters inside the available height. */
+html.zskin-active.zenx-premium [data-zenx-workspace] {
+ box-sizing:border-box !important;gap:var(--zx-layout-gap) !important;padding:var(--zx-outer-gutter) !important;
+ margin:0 !important;min-width:0 !important;min-height:0 !important;align-items:stretch !important;background:transparent !important;
+}
+html.zskin-active.zenx-premium [data-zenx-workspace] {overflow-x:auto !important;overflow-y:hidden !important;}
+html.zskin-active.zenx-premium [data-zenx-column] {box-sizing:border-box !important;min-width:0 !important;min-height:0 !important;}
+html.zskin-active.zenx-premium:not(.zskin-focus-mode) [data-zenx-workspace="grid"][data-zenx-columns="3"]:not([data-zenx-native-tracks]) {
+ grid-template-columns:clamp(250px,20vw,328px) minmax(340px,1fr) clamp(290px,24vw,405px) !important;
+}
+html.zskin-active.zenx-premium:not(.zskin-focus-mode) [data-zenx-workspace="grid"][data-zenx-columns="2"]:not([data-zenx-native-tracks]) {
+ grid-template-columns:clamp(250px,20vw,328px) minmax(340px,1fr) !important;
+}
+html.zskin-active.zenx-premium:not(.zskin-focus-mode) [data-zenx-workspace="grid"][data-zenx-columns="4"]:not([data-zenx-native-tracks]) {
+ grid-template-columns:clamp(250px,20vw,328px) minmax(340px,1fr) clamp(270px,23vw,385px) 46px !important;
+}
+html.zskin-active.zenx-premium [data-zenx-workspace="flex"]:not([data-zenx-native-tracks])>[data-zenx-column="fields"],
+html.zskin-active.zenx-premium [data-zenx-workspace="flex"]:not([data-zenx-native-tracks])>[data-zenx-column="views"] {flex:0 0 clamp(250px,20vw,328px) !important;width:auto !important;max-width:none !important;}
+html.zskin-active.zenx-premium [data-zenx-workspace="flex"]:not([data-zenx-native-tracks])>[data-zenx-column="conversation"] {flex:1 1 340px !important;width:auto !important;min-width:340px !important;max-width:none !important;}
+html.zskin-active.zenx-premium [data-zenx-workspace="flex"]:not([data-zenx-native-tracks])>[data-zenx-column="apps"] {flex:0 0 clamp(290px,24vw,405px) !important;width:auto !important;max-width:none !important;}
+html.zskin-active.zenx-premium [data-zenx-column] {display:flex !important;flex-direction:column !important;}
+html.zskin-active.zenx-premium [data-zenx-column] [data-zenx-surface="conversation"] {flex:1 1 auto !important;min-height:0 !important;height:auto !important;max-height:none !important;}
+/* A single boundary around each real card; original form controls stay inside. */
+html.zskin-active.zenx-premium :is([data-zenx-surface="fields"],[data-zenx-surface="views"],[data-zenx-surface="apps"],[data-zenx-surface="conversation"]) {
+ box-sizing:border-box !important;border:1px solid var(--zx-border) !important;border-radius:var(--zx-radius) !important;
+ background-color:var(--zx-panel) !important;background-image:linear-gradient(135deg,#ffffff10,transparent 46%) !important;
+ box-shadow:var(--zx-shadow) !important;color:var(--zx-ink) !important;
+ backdrop-filter:blur(22px) saturate(135%) !important;-webkit-backdrop-filter:blur(22px) saturate(135%) !important;
+ min-width:0 !important;min-height:0 !important;
+}
+html.zskin-active.zenx-premium :is([data-zenx-surface="fields"],[data-zenx-surface="views"]) {padding:18px !important;overflow:auto !important;scrollbar-gutter:stable;}
+html.zskin-active.zenx-premium [data-zenx-surface="apps"] {padding:12px !important;overflow:auto !important;}
+html.zskin-active.zenx-premium [data-zenx-surface="apps"] iframe {max-width:100%;border-radius:12px;}
+html.zskin-active.zenx-premium [data-zenx-surface="conversation"] {display:flex !important;flex-direction:column !important;overflow:hidden !important;padding:0 !important;isolation:isolate;}
+html.zskin-active.zenx-premium.zenx-wallpaper-on [data-zenx-surface="conversation"] {
+ background-image:linear-gradient(var(--zx-chat-veil),var(--zx-chat-veil)),var(--zenx-wallpaper) !important;
+ background-size:cover !important;background-position:center !important;background-repeat:no-repeat !important;
+}
+/* All wrappers on the route to the log must shrink. Only the native log
+   scrolls; no cap is applied to articles, rich message cards or attachments. */
+html.zskin-active.zenx-premium [data-zenx-chat-path="1"] {
+ display:flex !important;flex-direction:column !important;flex:1 1 0% !important;min-width:0 !important;min-height:0 !important;
+ height:auto !important;max-height:none !important;padding:0 !important;background:transparent !important;
+}
+html.zskin-active.zenx-premium [data-zenx-scroll-log="1"] {
+ flex:1 1 0% !important;min-height:0 !important;min-width:0 !important;height:auto !important;max-height:none !important;
+ overflow-y:auto !important;overflow-x:hidden !important;overscroll-behavior:contain;padding:20px 14px !important;
+ scroll-padding-block:20px;border:0 !important;border-radius:0 !important;background:transparent !important;animation:none !important;box-sizing:border-box !important;
+}
+html.zskin-active.zenx-premium [data-zenx-composer="1"] {
+ flex:0 0 auto !important;min-height:min-content !important;box-sizing:border-box !important;margin:10px 14px 14px !important;
+ padding:10px !important;border:1px solid var(--zx-border) !important;border-radius:16px !important;
+ background:var(--zx-panel-strong) !important;box-shadow:var(--zx-shadow) !important;backdrop-filter:blur(18px) !important;
+}
+html.zskin-active.zenx-premium [data-zenx-surface="conversation"]>:not([data-zenx-chat-path]):not([data-zenx-scroll-log]):not([data-zenx-composer]) {flex-shrink:0;}
+html.zskin-active.zenx-premium article[data-test-id="omni-log-comment-item"] {padding:7px 18px !important;max-height:none !important;overflow:visible !important;}
+html.zskin-active.zenx-premium article[data-test-id="omni-log-comment-item"] [data-test-id="omni-log-item-message"] {
+ box-sizing:border-box !important;width:fit-content !important;min-width:0 !important;max-width:min(86%,760px) !important;
+ max-height:none !important;overflow:visible !important;padding:12px 18px 25px !important;border-radius:20px !important;
+ background:color-mix(in srgb,var(--zenx-customer) 72%,transparent) !important;
+ border:1px solid color-mix(in srgb,var(--zenx-customer) 60%,#ffffff40) !important;
+ backdrop-filter:blur(14px) saturate(130%) !important;box-shadow:var(--zx-shadow) !important;
+}
+html.zskin-active.zenx-premium article[data-chat-role="agent"] [data-test-id="omni-log-item-message"] {background:color-mix(in srgb,var(--zenx-agent) 74%,transparent) !important;border-color:var(--zx-border) !important;}
+html.zskin-active.zenx-premium article:is([data-chat-role="bot"],[data-zenx-va="1"]) [data-test-id="omni-log-item-message"] {background:color-mix(in srgb,var(--zenx-va) 73%,transparent) !important;border-color:color-mix(in srgb,var(--zenx-va) 40%,#c2a3c0) !important;}
+html.zskin-active.zenx-premium [data-test-id="omni-log-message-content"] {font-size:14px !important;line-height:1.5 !important;overflow-wrap:anywhere !important;}
+html.zskin-active.zenx-premium [data-test-id="omni-log-item-message"]::before {font-size:14px !important;color:var(--zx-accent) !important;}
+html.zskin-active.zenx-premium article:is([data-chat-role="bot"],[data-zenx-va="1"]) [data-test-id="omni-log-item-message"]::before {color:#edb9f3 !important;-webkit-text-fill-color:#edb9f3 !important;}
+html.zskin-active.zenx-premium.zskin-light article:is([data-chat-role="bot"],[data-zenx-va="1"]) [data-test-id="omni-log-item-message"]::before {color:#70407d !important;-webkit-text-fill-color:#70407d !important;}
+html.zskin-active.zenx-premium [data-test-id="omni-log-item-message"]::after {font-size:11px !important;color:var(--zx-muted) !important;}
+/* Tools rail, app dock and native navigation are themed without new controls. */
+html.zskin-active.zenx-premium :is([data-zenx-surface="nav"],[data-zenx-surface="rail"]) {
+ box-sizing:border-box !important;padding:10px 7px !important;border:1px solid var(--zx-border) !important;border-radius:20px !important;
+ background:linear-gradient(155deg,#ffffff10,transparent 60%),var(--zx-shell) !important;
+ box-shadow:var(--zx-shadow) !important;color:var(--zx-ink) !important;backdrop-filter:blur(22px) saturate(145%) !important;
+}
+html.zskin-active.zenx-premium [data-zenx-surface="nav"] :is(a,button,[role="button"]) {border-radius:13px !important;color:var(--zx-ink) !important;}
+html.zskin-active.zenx-premium [data-zenx-surface="nav"] :is([aria-current="page"],[aria-selected="true"],button:hover,a:hover) {background:linear-gradient(135deg,color-mix(in srgb,var(--zx-accent) 24%,transparent),transparent) !important;box-shadow:inset 0 0 0 1px var(--zx-border),0 0 14px var(--zx-glow) !important;color:var(--zx-accent) !important;}
+html.zskin-active.zenx-premium :is([data-zenx-surface="header"],[data-zenx-surface="subheader"],[data-zenx-surface="footer"]) {background:linear-gradient(115deg,#ffffff0a,transparent),var(--zx-shell) !important;color:var(--zx-ink) !important;border-color:var(--zx-edge) !important;backdrop-filter:blur(18px) saturate(135%) !important;}
+html.zskin-active.zenx-premium [data-zenx-surface="footer"] {box-sizing:border-box !important;padding:10px 16px !important;}
+html.zskin-active.zenx-premium :is([data-test-id="header-tab"],[data-test-id="tabs-section-nav-item-ticket"],[data-test-id="workspace-tab"]) {background:linear-gradient(125deg,#ffffff13,transparent),var(--zx-control) !important;color:var(--zx-ink) !important;border:1px solid var(--zx-edge) !important;border-radius:14px !important;box-shadow:inset 0 1px 0 #ffffff14 !important;backdrop-filter:blur(16px) !important;}
+html.zskin-active.zenx-premium :is([data-test-id="header-tab"],[data-test-id="tabs-section-nav-item-ticket"]):is([aria-selected="true"],[data-entity-is-selected="true"]) {border-color:var(--zx-accent) !important;background:linear-gradient(120deg,color-mix(in srgb,var(--zx-accent) 25%,transparent),var(--zx-control)) !important;box-shadow:inset 0 1px 0 #ffffff20,0 0 14px var(--zx-glow) !important;}
+html.zskin-active.zenx-premium :is([data-zenx-surface="ticket"],[data-zenx-surface="status"]) {display:inline-flex !important;align-items:center !important;gap:7px !important;padding:8px 14px !important;border:1px solid var(--zx-border) !important;border-radius:12px !important;background:linear-gradient(135deg,#ffffff14,transparent),var(--zx-control) !important;color:var(--zx-ink) !important;box-shadow:var(--zx-shadow) !important;backdrop-filter:blur(18px) !important;font-weight:650 !important;}
+html.zskin-active.zenx-premium [data-zenx-surface="status"] {border-color:var(--zx-accent) !important;box-shadow:inset 0 0 12px var(--zx-glow),0 0 12px var(--zx-glow) !important;}
+html.zskin-active.zenx-premium [data-zenx-surface="avatar"] {border:1px solid var(--zx-border) !important;border-radius:50% !important;padding:3px !important;background:var(--zx-control) !important;box-shadow:inset 0 1px 0 #ffffff40,0 0 16px var(--zx-glow) !important;backdrop-filter:blur(14px) !important;color:var(--zx-ink) !important;}
+html.zskin-active.zenx-premium [data-zenx-surface="avatar"] img {border-radius:50% !important;object-fit:cover;}
+html.zskin-active.zenx-premium :is([data-garden-id="forms.input"],[data-garden-id="forms.select"],[data-garden-id="forms.textarea"],[data-zenx-surface="control"]) {border-radius:10px !important;border-color:var(--zx-border) !important;background-color:var(--zx-control) !important;color:var(--zx-ink) !important;}
+html.zskin-active.zenx-premium :focus-visible {outline-color:var(--zx-accent) !important;}
+/* Focus must win over all regular grid and flex column widths. */
+html.zskin-active.zenx-premium.zskin-focus-mode :is([data-zenx-workspace="grid"],[data-zenx-focus-grid="1"]) {grid-template-columns:minmax(0,1fr) !important;}
+html.zskin-active.zenx-premium.zskin-focus-mode [data-zenx-workspace]>[data-zenx-column]:not([data-zenx-column="conversation"]) {display:none !important;}
+html.zskin-active.zenx-premium.zskin-focus-mode [data-zenx-workspace]>[data-zenx-column="conversation"] {flex:1 1 auto !important;min-width:0 !important;width:100% !important;}
+/* Glass timer, preserving hover/pin/drag, duration, alerts and macro actions. */
+html.zskin-active.zenx-premium #zd-floating-sla-timer {
+ height:58px !important;padding:6px 12px !important;gap:10px !important;max-width:calc(100vw - 28px) !important;
+ background:linear-gradient(125deg,#ffffff17,transparent 50%),var(--zx-panel-strong) !important;border:1px solid var(--zx-accent) !important;
+ color:var(--zx-ink) !important;box-shadow:inset 0 1px 2px #ffffff35,inset 0 -2px 6px var(--zx-glow),0 0 16px var(--zx-glow),0 9px 24px #0005 !important;
+ backdrop-filter:blur(24px) saturate(150%) !important;
+}
+html.zskin-active.zenx-premium #zd-floating-sla-timer[data-zenx-timer-docked="1"] {left:auto !important;right:14px !important;top:74px !important;}
+html.zskin-active.zenx-premium #zd-floating-sla-timer.zd-collapsed {width:58px !important;min-width:58px !important;max-width:58px !important;height:58px !important;padding:0 !important;}
+html.zskin-active.zenx-premium #zd-floating-sla-timer.zd-collapsed.zd-countdown-active {width:230px !important;min-width:230px !important;max-width:230px !important;}
+html.zskin-active.zenx-premium #zd-floating-sla-timer #zd-timer-clock-btn {width:40px !important;height:40px !important;border:1px solid var(--zx-border) !important;background:linear-gradient(140deg,#ffffff1f,transparent) !important;box-shadow:0 0 12px var(--zx-glow) !important;}
+html.zskin-active.zenx-premium #zd-floating-sla-timer.zd-collapsed.zd-countdown-active #zd-timer-clock-btn {width:100% !important;height:100% !important;gap:17px !important;border:0 !important;background:transparent !important;box-shadow:none !important;}
+html.zskin-active.zenx-premium #zd-floating-sla-timer.zd-collapsed.zd-countdown-active #zd-timer-icon {display:inline-flex !important;width:38px !important;height:38px !important;border:1px solid var(--zx-accent);border-radius:50%;box-shadow:0 0 10px var(--zx-glow);}
+html.zskin-active.zenx-premium #zd-floating-sla-timer #zd-timer-logo {width:28px !important;height:28px !important;}
+html.zskin-active.zenx-premium #zd-floating-sla-timer #zd-timer-collapsed-display {flex-direction:column;gap:3px;color:var(--zx-accent) !important;font:700 23px/1.1 system-ui !important;font-variant-numeric:tabular-nums !important;}
+html.zskin-active.zenx-premium #zd-timer-collapsed-display::after {content:attr(data-zenx-label);font:400 10px/1.3 system-ui;color:var(--zx-ink);max-width:135px;overflow:hidden;text-overflow:ellipsis;}
+html.zskin-active.zenx-premium #zd-floating-sla-timer #zd-timer-display {font:750 24px/1.1 system-ui !important;font-variant-numeric:tabular-nums !important;color:var(--zx-accent) !important;}
+html.zskin-active.zenx-premium #zd-floating-sla-timer .zd-timer-ticket-pill {background:var(--zx-control) !important;border:1px solid var(--zx-border) !important;border-radius:8px !important;color:var(--zx-ink) !important;padding:4px 8px !important;}
+html.zskin-active.zenx-premium #zd-floating-sla-timer .zd-timer-pill {background:var(--zx-control) !important;border-color:var(--zx-border) !important;color:var(--zx-ink) !important;box-shadow:inset 0 1px 0 #ffffff14 !important;}
+html.zskin-active.zenx-premium #zd-floating-sla-timer :is(#zd-timer-macro-popup,#zd-sections-dropdown) {background:var(--zx-panel-strong) !important;color:var(--zx-ink) !important;border-color:var(--zx-border) !important;backdrop-filter:blur(24px) !important;}
+html.zskin-active.zenx-premium #zd-floating-sla-timer #zd-timer-macro-popup {left:auto !important;right:0 !important;top:calc(100% + 10px) !important;bottom:auto !important;max-width:calc(100vw - 28px) !important;}
+html.zskin-active.zenx-premium #zd-floating-sla-timer[data-zenx-popup-above="1"] #zd-timer-macro-popup {top:auto !important;bottom:calc(100% + 10px) !important;}
+html.zskin-active.zenx-premium #zd-floating-sla-timer.zd-timer-warning {border-color:#ffc34a !important;}
+html.zskin-active.zenx-premium #zd-floating-sla-timer.zd-timer-urgent {background:linear-gradient(125deg,#a62232e6,#6b1224ed) !important;border-color:#ff8491 !important;}
+html.zskin-active.zenx-premium #zd-floating-sla-timer.zd-timer-urgent :is(#zd-timer-display,#zd-timer-collapsed-display) {color:#fff !important;}
+@media(max-width:1100px) {
+ html.zskin-active.zenx-premium {--zx-layout-gap:12px;--zx-outer-gutter:12px;--zx-radius:18px;}
+ html.zskin-active.zenx-premium:not(.zskin-focus-mode) [data-zenx-workspace="grid"][data-zenx-columns="3"]:not([data-zenx-native-tracks]) {grid-template-columns:220px minmax(340px,1fr) 260px !important;}
+ html.zskin-active.zenx-premium [data-zenx-workspace="flex"]:not([data-zenx-native-tracks])>[data-zenx-column="fields"] {flex-basis:220px !important;}
+ html.zskin-active.zenx-premium [data-zenx-workspace="flex"]:not([data-zenx-native-tracks])>[data-zenx-column="apps"] {flex-basis:260px !important;}
+}
+@media(prefers-reduced-motion:reduce) {html.zskin-active.zenx-premium * {scroll-behavior:auto !important;}}
+@media(prefers-reduced-motion:no-preference) {html.zskin-active.zenx-premium.zenx-wallpaper-on.zenx-wallpaper-motion [data-zenx-surface="conversation"] {animation:zenx-wallpaper-drift 24s ease-in-out infinite alternate;}}
+/* Fill wrapped columns as well as direct native grid cells. */
+html.zskin-active.zenx-premium [data-zenx-column] :is([data-zenx-surface="fields"],[data-zenx-surface="views"],[data-zenx-surface="apps"]) {flex:1 1 0% !important;min-height:0 !important;}
+html.zskin-active.zenx-premium [data-zenx-surface="input"] {border-radius:10px !important;border-color:var(--zx-border) !important;color:var(--zx-ink) !important;background-color:var(--zx-control) !important;}
+html.zskin-active.zenx-premium article[data-chat-role] [data-test-id="omni-log-item-message"]::before {color:var(--zx-accent) !important;}
+html.zskin-active.zenx-premium article[data-chat-role] [data-test-id="omni-log-item-message"]::after {color:var(--zx-muted) !important;}
+html.zskin-active.zenx-premium :is([data-test-id="ticket-top-bar"],[data-test-id="ticket-subheader"]) {min-height:76px !important;box-sizing:border-box !important;}
+/* The browser must not start an image drag over the timer's native drag handle. */
+html.zskin-active.zenx-premium #zd-floating-sla-timer #zd-timer-logo {-webkit-user-drag:none;user-select:none;pointer-events:none;}
+
+/* Preserve explicit native visibility for inactive ticket panes. */
+html.zskin-active.zenx-premium :is([data-test-id="component-type-MainConversationPane"],[data-test-id="ticket-main-conversation"],[data-test-id="ticket-conversation"],[data-test-id="component-type-TicketFieldsPane"],[data-test-id="ticket-fields"],[data-test-id="ticket-sidebar"],[data-test-id="component-type-AppsPane"],[data-test-id="ticket-apps-pane"])[hidden] {display:none !important;}
+
+/* 8.4: increase side-card transparency without lowering text opacity. */
+html.zskin-active.zenx-premium {--zx-side-panel:color-mix(in srgb,var(--zx-panel) 82%,transparent);}
+/* Empty native composer reservations must not clip solved/idle conversations.
+   workspace.js only marks shells without visible editing or other controls. */
+html.zskin-active.zenx-premium [data-zenx-empty-composer="1"] {
+ display:none !important;min-height:0 !important;height:0 !important;max-height:0 !important;
+ margin:0 !important;padding:0 !important;border:0 !important;flex:0 0 0 !important;
+}
+/* Compact idle launcher, aligned to the native navigation icons. */
+html.zskin-active.zenx-premium #zd-floating-sla-timer.zd-collapsed:not(.zd-countdown-active) {
+ width:38px !important;min-width:38px !important;max-width:38px !important;height:38px !important;
+ min-height:38px !important;max-height:38px !important;padding:0 !important;gap:0 !important;
+ box-sizing:border-box !important;border-radius:12px !important;
+}
+html.zskin-active.zenx-premium #zd-floating-sla-timer.zd-collapsed:not(.zd-countdown-active) :is(#zd-timer-drag-handle,#zd-timer-clock-btn) {
+ display:flex !important;align-items:center !important;justify-content:center !important;
+ box-sizing:border-box !important;width:100% !important;height:100% !important;min-width:0 !important;
+ padding:0 !important;margin:0 !important;gap:0 !important;border:0 !important;
+ background:transparent !important;box-shadow:none !important;transform:none !important;
+}
+html.zskin-active.zenx-premium #zd-floating-sla-timer.zd-collapsed:not(.zd-countdown-active) #zd-timer-icon {
+ width:22px !important;height:22px !important;margin:0 !important;padding:0 !important;
+ display:flex !important;align-items:center !important;justify-content:center !important;transform:none !important;
+}
+html.zskin-active.zenx-premium #zd-floating-sla-timer.zd-collapsed:not(.zd-countdown-active) #zd-timer-logo {width:20px !important;height:20px !important;object-fit:contain !important;}
+html.zskin-active.zenx-premium #zd-floating-sla-timer[data-zenx-timer-in-rail="1"] {left:var(--zenx-timer-rail-left) !important;right:auto !important;}

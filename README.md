@@ -1,3 +1,7 @@
+# ZenX 9.8.1
+
+[Download ZenX 9.8.1](ZenX-9.8.1.zip?raw=true). This update checks the precise send timestamp against Zendesk’s own message age and keeps the native label when the timestamps disagree.
+
 # ZenX 9.8.0
 
 [Download ZenX 9.8.0](ZenX-9.8.0.zip?raw=true). Use **ZenX → Dashboard → Features** to show or hide the floating button and live message ages. Elapsed seconds appear when Zendesk provides a timestamp precise to the second with a timezone.

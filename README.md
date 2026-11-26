@@ -1,3 +1,7 @@
+# ZenX 9.8.0
+
+[Download ZenX 9.8.0](ZenX-9.8.0.zip?raw=true). Use **ZenX → Dashboard → Features** to show or hide the floating button and live message ages. Elapsed seconds appear when Zendesk provides a timestamp precise to the second with a timezone.
+
 # ZenX 9.7.0
 
 [Download ZenX 9.7.0](ZenX-9.7.0.zip?raw=true) for individual feature switches in **ZenX → Dashboard → Features**. Extract the ZIP and select the folder containing `manifest.json` when loading the extension.

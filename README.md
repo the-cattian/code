@@ -1,3 +1,7 @@
+# ZenX 9.8.2
+
+[Download ZenX 9.8.2](ZenX-9.8.2.zip?raw=true). Live message ages use the ISO send timestamp on Zendesk’s relative-time element, so the tooltip’s display timezone does not affect elapsed seconds.
+
 # ZenX 9.8.1
 
 [Download ZenX 9.8.1](ZenX-9.8.1.zip?raw=true). This update checks the precise send timestamp against Zendesk’s own message age and keeps the native label when the timestamps disagree.
